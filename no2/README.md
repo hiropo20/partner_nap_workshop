@@ -6,92 +6,91 @@
 
 ## Docker Composeのインストール
 ### 1. Install Docker Compose 
-Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application’s services. Then, with a single command, you create and start all the services from your configuration.
+Docker composeは複数のコンテナを利用するDockerアプリケーションを定義するツールです。Docker Composeを利用する場合には、YAMLファイルにアプリケーションとして実行したい内容を記述します。その後、コマンド実行時にYAMLファイルを指定することで、指定の通りアプリケーションを起動することが可能です
 ```
 $ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 ```
-Set execution rights for Docker Compose
+Docker Composeコマンドに適切な権限を付与
 ```
 $ sudo chmod +x /usr/local/bin/docker-compose
 ```
-Test Docker Compose 
+Docker Composeコマンドの動作を確認
 ```
 $ docker-compose --version
 ```
-### 2. Run NGINX as a Container
+### 2. ContainerでNGINXを起動
 
-Pull the container image
+Docker Container ImageをPull
 ```
 $ docker pull nginx
 ```
-Run nginx as a container
+NGINX Containerの起動
 ```
 $ docker run --name ngx-docker -p 80:80 -d nginx
 ```
-Test nginx webserver
+Web Serverの動作確認
 ```
 $ curl http://localhost:80/
 ```
-Access the configuration inside the container
-Get the ContaineID
+以下のコマンドを参考にContainerの動作状況などを確認
 ```
 $ docker exec -it CONTAINER_ID bash
 $ docker ps -aqf “name=ngx-docker"
 $ docker exec -it `docker ps -aqf "name=ngx-docker"`  bash
 ```
-Stop nginx container
+Containerの停止
 ```
 $ docker stop ngx-docker
 ```
-Delete nginx container
+Containerの削除
 ```
 $ docker rm ngx-docker
 ```
-Stop nginx new container
+新しいコンテナの起動
 ```
 $ docker stop ngx-docker-new
 ```
-Delete nginx new container
+新しいコンテナの削除
 ```
 $ docker rm ngx-docker-new
 ```
-### 3.	Deploy application with Docker Compose
-Deployment file
+### 3.	Docker Composeを利用してアプリケーションを実行
+Deployment file:
 https://github.com/mcheo-nginx/handson_training/tree/main/basic_docker
+
+GitHubよりファイルを取得
 ```
 $ cd ~
 $ git clone https://github.com/mcheo-nginx/handson_training.git
 $ cd handson_training/basic_docker/
 ```
-run the deployment
+デプロイの実行
 ```
 $ docker-compose -f docker-compose.yml up -d
 ```
-Test the deployment
+デプロイ結果の確認
 ```
 $ curl -sv localhost:8000 | head
 ```
-Edit Configuration of the deployment
-Edit the nginx.conf file. (comment out proxy_pass and add “return” directive)
+設定の変更。nginx.conf ファイルの変更。(proxy_passのコメントアウト、“return” directiveの追加)
 ```
         location / {
             #proxy_pass http://backend;
             return 200 "Container Lab";
         }
 ```
-
-restart the deployment
+デプロイしたアプリケーションの再起動
 ```
 $ docker-compose -f docker-compose.yml restart
 ```
-Test the deployment
+再度、デプロイ結果の確認
 ```
 $ curl -sv localhost:8000 | head
 ```
 
 
 ### ref: Docker cheatsheet for beginners
-If you want to learn Docker commands, but you don't know where to start here is a nice list of cli commands that I use to manage containers, images and many more using Docker from terminal. 
+Dockerコマンド参考情報。以下の内容やInternetの情報を参考にDockerコマンドを実行してください  
 
 Docker machine commands  
 * Create new: docker-machine create MACHINE  
