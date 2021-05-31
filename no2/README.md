@@ -89,7 +89,7 @@ curl -sv localhost:8000 | head
 ```
 
 
-### ref: Docker cheatsheet for beginners
+### 参考: Docker cheatsheet for beginners
 Dockerコマンド参考情報。以下の内容やInternetの情報を参考にDockerコマンドを実行してください  
 
 Docker machine commands  
