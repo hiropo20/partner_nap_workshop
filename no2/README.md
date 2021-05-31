@@ -8,51 +8,51 @@
 ### 1. Install Docker Compose 
 Docker composeは複数のコンテナを利用するDockerアプリケーションを定義するツールです。Docker Composeを利用する場合には、YAMLファイルにアプリケーションとして実行したい内容を記述します。その後、コマンド実行時にYAMLファイルを指定することで、指定の通りアプリケーションを起動することが可能です
 ```
-$ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 ```
 Docker Composeコマンドに適切な権限を付与
 ```
-$ sudo chmod +x /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
 ```
 Docker Composeコマンドの動作を確認
 ```
-$ docker-compose --version
+docker-compose --version
 ```
 ### 2. ContainerでNGINXを起動
 
 Docker Container ImageをPull
 ```
-$ docker pull nginx
+docker pull nginx
 ```
 NGINX Containerの起動
 ```
-$ docker run --name ngx-docker -p 80:80 -d nginx
+docker run --name ngx-docker -p 80:80 -d nginx
 ```
 Web Serverの動作確認
 ```
-$ curl http://localhost:80/
+curl http://localhost:80/
 ```
 以下のコマンドを参考にContainerの動作状況などを確認
 ```
-$ docker exec -it CONTAINER_ID bash
-$ docker ps -aqf “name=ngx-docker"
-$ docker exec -it `docker ps -aqf "name=ngx-docker"`  bash
+docker exec -it CONTAINER_ID bash
+docker ps -aqf “name=ngx-docker"
+docker exec -it `docker ps -aqf "name=ngx-docker"`  bash
 ```
 Containerの停止
 ```
-$ docker stop ngx-docker
+docker stop ngx-docker
 ```
 Containerの削除
 ```
-$ docker rm ngx-docker
+docker rm ngx-docker
 ```
 新しいコンテナの起動
 ```
-$ docker stop ngx-docker-new
+docker stop ngx-docker-new
 ```
 新しいコンテナの削除
 ```
-$ docker rm ngx-docker-new
+docker rm ngx-docker-new
 ```
 ### 3.	Docker Composeを利用してアプリケーションを実行
 Deployment file:
@@ -60,17 +60,17 @@ https://github.com/mcheo-nginx/handson_training/tree/main/basic_docker
 
 GitHubよりファイルを取得
 ```
-$ cd ~
-$ git clone https://github.com/mcheo-nginx/handson_training.git
-$ cd handson_training/basic_docker/
+cd ~
+git clone https://github.com/mcheo-nginx/handson_training.git
+cd handson_training/basic_docker/
 ```
 デプロイの実行
 ```
-$ docker-compose -f docker-compose.yml up -d
+docker-compose -f docker-compose.yml up -d
 ```
 デプロイ結果の確認
 ```
-$ curl -sv localhost:8000 | head
+curl -sv localhost:8000 | head
 ```
 設定の変更。nginx.conf ファイルの変更。(proxy_passのコメントアウト、“return” directiveの追加)
 ```
@@ -81,11 +81,11 @@ $ curl -sv localhost:8000 | head
 ```
 デプロイしたアプリケーションの再起動
 ```
-$ docker-compose -f docker-compose.yml restart
+docker-compose -f docker-compose.yml restart
 ```
 再度、デプロイ結果の確認
 ```
-$ curl -sv localhost:8000 | head
+curl -sv localhost:8000 | head
 ```
 
 
