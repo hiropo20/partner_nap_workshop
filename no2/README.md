@@ -48,7 +48,7 @@ docker rm ngx-docker
 ```
 新しいコンテナの起動
 ```
-docker run --name ngx-docker -p 80:80 -d ngx-docker-new
+docker run --name ngx-docker-new -p 80:80 -d nginx
 ```
 新しいコンテナの停止
 ```
