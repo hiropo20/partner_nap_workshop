@@ -89,7 +89,7 @@ vi ./nginx.conf
 ```
         location / {
             #proxy_pass http://backend;
-            return 200 "Container Lab";
+            return 200 "Container Lab\n";
         }
 ```
 デプロイしたアプリケーションの再起動
