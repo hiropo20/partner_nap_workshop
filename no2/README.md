@@ -33,9 +33,14 @@ Web Serverの動作確認
 curl http://localhost:80/
 ```
 以下のコマンドを参考にContainerの動作状況などを確認
+docker ps コマンドの結果を確認し、CONTAINER_IDの表示結果を参考に以下を実施
 ```
-docker exec -it CONTAINER_ID bash
-docker ps -aqf “name=ngx-docker"
+docker ps
+docker exec -it <<CONTAINER_ID>>  bash
+```
+上記コマンドと同様の内容を以下コマンドで実行できることを確認
+```
+docker ps -aqf "name=ngx-docker"
 docker exec -it `docker ps -aqf "name=ngx-docker"`  bash
 ```
 Containerの停止
@@ -77,6 +82,10 @@ docker-compose -f docker-compose.yml up -d
 curl -sv localhost:8000 | head
 ```
 設定の変更。nginx.conf ファイルの変更。(proxy_passのコメントアウト、“return” directiveの追加)
+```
+vi ./nginx.conf
+```
+設定変更内容
 ```
         location / {
             #proxy_pass http://backend;
