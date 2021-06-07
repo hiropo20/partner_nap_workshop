@@ -93,10 +93,9 @@ ELKの設定投入
 ```
 ./importkibana.sh 
 ```
-※ELKの起動には時間がかかるため、以下のようなエラーとなった場合には少し時間を開けて実行ください
-※docker psの結果が正しいにもかかわらず意図した通りELKの設定ができない場合には、一度dockmer-composeを停止の後、再度実行してください
-
-※docker exec <container> bash / ps -aef の結果はりつけておく
+- ※ELKの起動には時間がかかるため、以下のようなエラーとなった場合には少し時間を開けて実行ください   
+- ※docker psの結果が正しいにもかかわらず意図した通りELKの設定ができない場合には、一度dockmer-composeを停止の後、再度実行してください   
+- ※docker exec <container> bash / ps -aef の結果はりつけておく   
 
 NGINX App Protectが正しく動作していることを確認
 ```
