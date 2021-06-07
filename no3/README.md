@@ -117,11 +117,7 @@ curl http://localhost/?a=%3Cscript%3E | head
 ```
 ※現在ブロックする設定ではないため、WebPageの内容が出力される
 
-Kibanaを開き、結果を確認
-1. Dashboard
-    1. Overview
-    1. False Positive
-1. Discover
+Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
 
 ### 2. NGINX App Protectのログポリシー変更
 NGINX App Protectコンテナのログ設定ファイルを修正
@@ -152,7 +148,7 @@ docker logs <container>
 ```
 ./badtraffic.sh
 ```
-Kibanaを開き、結果を確認
+Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
 
 ### 3. NGINX App Protectのセキュリティポリシー変更
 NGINX App Protectコンテナのログ設定ファイルを修正
@@ -179,7 +175,7 @@ docker exec -it <container> nginx -s reload
 ```
 docker logs <container>
 ```
-Kibanaを開き、結果を確認
+Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
 
 
 
