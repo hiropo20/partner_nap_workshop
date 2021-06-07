@@ -1,8 +1,15 @@
+
 # Lab手順
 
 ## 実施環境
 * 事前にラボ環境へのInviteを行っておりますので、メールをご確認ください
 * 利用するコマンド： git , docker, docker-compose , jq , sudo, curl
+
+## UDF コンポーネントへの接続
+Windows Jump HostからCLIの操作を行う場合、以下タブからRDP Clientファイルをダウンロードいただき接続ください
+<br><img src="https://user-images.githubusercontent.com/43058573/121031351-3a086900-c7e5-11eb-8a85-f634aa923d4e.png" alt="RDP" width="200"><br>
+Docker Hostへの接続は以下メニューを開き利用ください
+<br><img src="https://user-images.githubusercontent.com/43058573/121031353-3a086900-c7e5-11eb-90a9-28283cebd5a9.png" alt="Docker Menu" width="200"><br>
 
 ## Git clone
 ラボで必要なファイルをGitHubから取得
@@ -173,3 +180,15 @@ docker exec -it <container> nginx -s reload
 docker logs <container>
 ```
 Kibanaを開き、結果を確認
+
+
+
+## Kibana操作画面
+左側メニューよりDashboardを選択し、ご覧になりたい内容を選択ください
+<br><img src="https://user-images.githubusercontent.com/43058573/121031357-3aa0ff80-c7e5-11eb-828d-50d298736837.png" alt="Menu Dashboard" width="150"><br>
+<br><img src="https://user-images.githubusercontent.com/43058573/121031356-3aa0ff80-c7e5-11eb-9f7e-9ec2b907592c.png" alt="Dashboard 選択画面" width="450"><br>
+<br><img src="https://user-images.githubusercontent.com/43058573/121031361-3b399600-c7e5-11eb-9c33-1c2231de21d1.png" alt="Dashboard Flase Positive" width="500"><br>
+<br><img src="https://user-images.githubusercontent.com/43058573/121031341-383ea580-c7e5-11eb-9970-44736c1479ed.png" alt="Dashboard Overview" width="500"><br>
+左側メニューよりDiscoverを選択ください
+<br><img src="https://user-images.githubusercontent.com/43058573/121031360-3b399600-c7e5-11eb-9fc7-8fa1b704c3ab.png" alt="Menu Discover" width="150"><br>
+<br><img src="https://user-images.githubusercontent.com/43058573/121031345-396fd280-c7e5-11eb-9b46-2f8744ec11a1.png" alt="Discover" width="500"><br>
