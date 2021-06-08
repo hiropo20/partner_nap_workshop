@@ -40,7 +40,12 @@ docker build --no-cache -t nginxplus .
 ```
 docker images | grep nginx
 ```
-※出力結果例※
+出力結果例
+```
+$ docker images | grep nginxplus
+nginxplus            latest        e36a40c4f511   40 seconds ago   88.1MB
+```
+
 ### 2. NGINX Container 動作確認
 #### ラボ環境の実行
 ```
@@ -50,9 +55,51 @@ docker-compose -f docker-compose-labnginx.yaml up -d
 ```
 docker ps 
 ```
+出力結果例
+```
+CONTAINER ID   IMAGE                COMMAND                  CREATED         STATUS          PORTS                                               NAMES
+deafd73eac5f   nginxplus:latest     "nginx -g 'daemon of…"   3 minutes ago   Up 57 seconds   80/tcp, 0.0.0.0:8000->8000/tcp, :::8000->8000/tcp   nplus-container_nginxplus_1
+b2ba5ea66ff1   ianwijaya/hackazon   "supervisord -n"         3 minutes ago   Up 3 minutes    0.0.0.0:8081->80/tcp, :::8081->80/tcp               nplus-container_app1_1
+ecf015fa2d2a   ianwijaya/hackazon   "supervisord -n"         3 minutes ago   Up 3 minutes    0.0.0.0:8082->80/tcp, :::8082->80/tcp               nplus-container_app2_1
+
+```
+正しくNGINX Plus Containerが起動しない場合、以下内容を参考に再度docker-composeを実行ください
+```
+
+$ docker ps
+CONTAINER ID   IMAGE                COMMAND            CREATED          STATUS         PORTS                                   NAMES
+b2ba5ea66ff1   ianwijaya/hackazon   "supervisord -n"   11 seconds ago   Up 7 seconds   0.0.0.0:8081->80/tcp, :::8081->80/tcp   nplus-container_app1_1
+ecf015fa2d2a   ianwijaya/hackazon   "supervisord -n"   11 seconds ago   Up 7 seconds   0.0.0.0:8082->80/tcp, :::8082->80/tcp   nplus-container_app2_1
+
+
+$ docker ps -a
+CONTAINER ID   IMAGE                COMMAND                  CREATED          STATUS                      PORTS                                   NAM                                                             ES
+deafd73eac5f   nginxplus:latest     "nginx -g 'daemon of…"   15 seconds ago   Exited (1) 13 seconds ago                                           nplus-container_nginxplus_1
+b2ba5ea66ff1   ianwijaya/hackazon   "supervisord -n"         15 seconds ago   Up 10 seconds               0.0.0.0:8081->80/tcp, :::8081->80/tcp   nplus-container_app1_1
+ecf015fa2d2a   ianwijaya/hackazon   "supervisord -n"         15 seconds ago   Up 10 seconds               0.0.0.0:8082->80/tcp, :::8082->80/tcp   nplus-container_app2_1
+
+nginxplus が Exit していることが確認できる
+
+nginxplusのログを確認
+
+$ docker logs $(docker ps -a -f name=nginxplus  -q)
+2021/06/08 02:07:43 [emerg] 1#1: host not found in upstream "app1:80" in /etc/nginx/nginx.conf:26
+nginx: [emerg] host not found in upstream "app1:80" in /etc/nginx/nginx.conf:26
+
+docker-compsoe を再度実行
+$ docker-compose -f docker-compose-labnginx.yaml up -d
+nplus-container_app2_1 is up-to-date
+Starting nplus-container_nginxplus_1 ...
+Starting nplus-container_nginxplus_1 ... done
+
+$ docker ps -a -f name=nginxplus
+CONTAINER ID   IMAGE              COMMAND                  CREATED         STATUS         PORTS                                               NAMES
+deafd73eac5f   nginxplus:latest   "nginx -g 'daemon of…"   7 minutes ago   Up 5 minutes   80/tcp, 0.0.0.0:8000->8000/tcp, :::8000->8000/tcp   nplus-container_nginxplus_1
+
+```
 #### 疎通の確認
 ```
-curl http://localhost:8000/ | head
+curl -s http://localhost:8000/ | head
 ```
 #### ラボ環境の停止
 ```
@@ -83,23 +130,17 @@ docker build --no-cache -t app-protect .
 ```
 docker images | grep nginxplus
 ```
-出力結果例
-```
-$ docker images | grep nginxplus
-nginxplus            latest        e36a40c4f511   40 seconds ago   88.1MB
-```
+
 
 ### 2. NGINX Plus + NGINX App Protect 動作確認
 #### ラボ環境の実行
 ```
-docker-compose -f docker-compose-lab-appprotect.yaml up -d
+docker-compose -f docker-compose-labnginx.yaml up -d
 ```
 #### コンテナ動作状況の確認
 ```
 docker ps 
 ```
-※出力結果例※
-
 #### ELKの設定投入
 ```
 ./importkibana.sh 
