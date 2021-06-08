@@ -81,9 +81,13 @@ docker build --no-cache -t app-protect .
 ```
 #### 作成したDocker Imageの確認
 ```
-docker images | grep nginx
+docker images | grep nginxplus
 ```
-※出力結果例※
+出力結果例
+```
+$ docker images | grep nginxplus
+nginxplus            latest        e36a40c4f511   40 seconds ago   88.1MB
+```
 
 ### 2. NGINX Plus + NGINX App Protect 動作確認
 #### ラボ環境の実行
