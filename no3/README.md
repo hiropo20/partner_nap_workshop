@@ -325,6 +325,7 @@ docker logs $(docker ps -f name=approtect -q)
 
 
 ## Kibana操作画面
+### Dashboard
 左側メニューよりDashboardを選択し、ご覧になりたい内容を選択ください
 <br><img src="https://user-images.githubusercontent.com/43058573/121031357-3aa0ff80-c7e5-11eb-828d-50d298736837.png" alt="Menu Dashboard" width="150"><br>
 レポート選択画面
@@ -333,6 +334,7 @@ False Positive
 <br><img src="https://user-images.githubusercontent.com/43058573/121031361-3b399600-c7e5-11eb-9c33-1c2231de21d1.png" alt="Dashboard Flase Positive" width="500"><br>
 Overview
 <br><img src="https://user-images.githubusercontent.com/43058573/121031341-383ea580-c7e5-11eb-9970-44736c1479ed.png" alt="Dashboard Overview" width="500"><br>
+### Discover
 左側メニューよりDiscoverを選択ください
 <br><img src="https://user-images.githubusercontent.com/43058573/121031360-3b399600-c7e5-11eb-9fc7-8fa1b704c3ab.png" alt="Menu Discover" width="150"><br>
 Discover
