@@ -261,22 +261,37 @@ docker logs $(docker ps -f name=approtect -q)
 ```
 #### いくつかの攻撃リクエストを実行し、その結果を確認する
 ```
+cat << EOF > badtraffic.sh
+#!/bin/bash
+curl -s -H "1.2.3.4" http://localhost | head
+curl -s http://localhost/%09 | head
+curl -s http://localhost/index.bak | head
+curl -s http://localhost?a=%3Cscript%3E | head
+curl -s http://localhost | head
+curl -s http://localhost/\<script\> | head
+curl -s -H "Content-Length: -26" http://localhost/ | head
+curl -s http://localhost/index.php | head
+curl -s http://localhost/test.exe | head
+curl -s http://localhost/index.html | head
+curl -s http://localhost/basic/index.php | head
+EOF
+
 ./badtraffic.sh
 ```
 #### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
 
 ### 4. NGINX App Protectのセキュリティポリシー変更
 NGINX App Protectコンテナのポリシー設定ファイルを修正
-***修正***
+
 ```
-docker exec -it <container> bash
-grep access_policy /etc/nginx/nginx.conf
-vi /etc/nginx/policy.json
+docker exec -it $(docker ps -f name=approtect -q) bash
+grep policy_file /etc/nginx/nginx.conf
+vi /etc/nginx/labpolicy.json
 
 変更内容
-        "enforcementMode": "tranceparent"
+  "enforcementMode": "transparent"
 to
-        "enforcementMode": "blocking"
+  "enforcementMode": "blocking"
 ```
 #### シェルから抜ける
 ```
@@ -284,11 +299,16 @@ exit
 ```
 #### 設定の読み込み
 ```
-docker exec -it <container> nginx -s reload
+docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
 ```
 #### ログの確認
 ```
-docker logs <container>
+docker logs $(docker ps -f name=approtect -q)
+```
+
+#### いくつかの攻撃リクエストを実行し、その結果を確認する
+```
+./badtraffic.sh
 ```
 #### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
 
