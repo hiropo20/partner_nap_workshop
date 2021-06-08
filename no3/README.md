@@ -1,4 +1,5 @@
 
+
 # Lab手順
 
 ## 実施環境
@@ -9,12 +10,16 @@
 ### Windows Jump HostへのRDP接続
 Windows Jump HostからCLIの操作を行う場合、以下タブからRDP Clientファイルをダウンロードいただき接続ください
 <br><img src="https://user-images.githubusercontent.com/43058573/121031351-3a086900-c7e5-11eb-8a85-f634aa923d4e.png" alt="RDP" width="200"><br>
+Windows Jump Hostへログインいただくと、SSH Client(Putty)がありますので、そちらからDocker_HOSTへ接続ください
+<br><img src="https://user-images.githubusercontent.com/43058573/121128672-bee79700-c866-11eb-87d7-8ae3b791ae3e.png" alt="Putty" width="200"><br>
 RDPのUser名、パスワードは以下を参照ください
+<br><img src="https://user-images.githubusercontent.com/43058573/121128683-c0b15a80-c866-11eb-9487-b2c89bede77d.png" alt="Credential" width="150"><br>
+こちらのタブの下の内容を参照ください
 
 ### Linux Hostへの接続
 Docker Hostへの接続は以下メニューを開き利用ください
 <br><img src="https://user-images.githubusercontent.com/43058573/121031353-3a086900-c7e5-11eb-90a9-28283cebd5a9.png" alt="Docker Menu" width="200"><br>
-SSHはSSH鍵認証を用いて接続可能です。手順は以下を参照ください
+SSHはSSH鍵認証を用いて接続可能です。手順は以下を参照ください※ラボ当日にこちらへ貼り付けます※
 
 ## Git clone
 ラボで必要なファイルをGitHubから取得
