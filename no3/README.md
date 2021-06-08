@@ -263,17 +263,17 @@ docker logs $(docker ps -f name=approtect -q)
 ```
 cat << EOF > badtraffic.sh
 #!/bin/bash
-curl -s -H "1.2.3.4" http://localhost | head
-curl -s http://localhost/%09 | head
-curl -s http://localhost/index.bak | head
-curl -s http://localhost?a=%3Cscript%3E | head
-curl -s http://localhost | head
-curl -s http://localhost/\<script\> | head
-curl -s -H "Content-Length: -26" http://localhost/ | head
-curl -s http://localhost/index.php | head
-curl -s http://localhost/test.exe | head
-curl -s http://localhost/index.html | head
-curl -s http://localhost/basic/index.php | head
+curl -s -H "1.2.3.4" http://localhost -o /dev/null
+curl -s http://localhost/%09 -o /dev/null
+curl -s http://localhost/index.bak -o /dev/null
+curl -s http://localhost?a=%3Cscript%3E -o /dev/null
+curl -s http://localhost -o /dev/null
+curl -s http://localhost/\<script\> -o /dev/null
+curl -s -H "Content-Length: -26" http://localhost/ -o /dev/null
+curl -s http://localhost/index.php -o /dev/null
+curl -s http://localhost/test.exe -o /dev/null
+curl -s http://localhost/index.html -o /dev/null
+curl -s http://localhost/basic/index.php -o /dev/null
 EOF
 
 ./badtraffic.sh
