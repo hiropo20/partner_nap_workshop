@@ -166,10 +166,11 @@ curl http://localhost/?a=%3Cscript%3E | head
 
 ### 3. NGINX App Protectのログポリシー変更
 #### NGINX App Protectコンテナのログ設定ファイルを修正
-***修正***
+
 ```
-docker exec -it <container> bash
-grep access_log /etc/nginx/nginx.conf
+docker exec -it $(docker ps -f name=approtect -q) bash
+grep app_protect_security_log /etc/nginx/nginx.conf
+
 vi /etc/nginx/custom_log_format.json
 
 変更内容
@@ -183,11 +184,11 @@ exit
 ```
 #### 設定の読み込み
 ```
-docker exec -it <container> nginx -s reload
+docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
 ```
 #### ログの確認
 ```
-docker logs <container>
+docker logs $(docker ps -f name=approtect -q)
 ```
 #### いくつかの攻撃リクエストを実行し、その結果を確認する
 ```
