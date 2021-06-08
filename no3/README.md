@@ -18,7 +18,8 @@ RDPのUser名、パスワードはJumpHost > Documentationタブ > Credentials�
 ### Linux Hostへの接続
 Docker Hostへの接続は以下メニューを開き利用ください
 <br><img src="https://user-images.githubusercontent.com/43058573/121031353-3a086900-c7e5-11eb-90a9-28283cebd5a9.png" alt="Docker Menu" width="200"><br>
-SSHはSSH鍵認証を用いて接続可能です。手順は以下を参照ください
+Docker HOSTへのSSH接続は、Jump Host経由　または、<br>
+SSH鍵認証を用いて接続可能です。SSH鍵の登録手順は以下を参照ください
 <br><a href="https://github.com/hiropo20/partner_nap_workshop_secure/blob/main/UDF_SSH_Key.pdf">UDF LAB SSH鍵登録マニュアル</a> (ラボ実施時閲覧可に変更します)<br>
 
 ## Git clone
