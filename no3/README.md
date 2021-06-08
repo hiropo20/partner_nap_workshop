@@ -10,8 +10,9 @@
 ### Windows Jump HostへのRDP接続
 Windows Jump HostからCLIの操作を行う場合、以下タブからRDP Clientファイルをダウンロードいただき接続ください
 <br><img src="https://user-images.githubusercontent.com/43058573/121031351-3a086900-c7e5-11eb-8a85-f634aa923d4e.png" alt="RDP" width="200"><br>
-Windows Jump Hostへログインいただくと、SSH Client(Putty)がありますので、そちらからDocker_HOSTへ接続ください
-<br><img src="https://user-images.githubusercontent.com/43058573/121128672-bee79700-c866-11eb-87d7-8ae3b791ae3e.png" alt="Putty" width="200"><br>
+Windows Jump Hostへログインいただくと、SSHを実行するバッチファイルがありますので、そちらからDocker_HOSTへ接続ください
+
+<br><img src="https://user-images.githubusercontent.com/43058573/121169908-7b555300-c88f-11eb-9371-b74fb6fbc03a.png" alt="ssh" width="200"><br>
 RDPのUser名、パスワードはJumpHost > Documentationタブ > Credentialsの項目を参照ください
 <br><img src="https://user-images.githubusercontent.com/43058573/121128683-c0b15a80-c866-11eb-9487-b2c89bede77d.png" alt="Credential" width="150"><br>
 こちらのタブの下の内容を参照ください
