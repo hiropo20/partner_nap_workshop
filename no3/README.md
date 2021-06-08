@@ -135,7 +135,7 @@ docker images | grep nginxplus
 ### 2. NGINX Plus + NGINX App Protect 動作確認
 #### ラボ環境の実行
 ```
-docker-compose -f docker-compose-labnginx.yaml up -d
+docker-compose -f docker-compose-lab-appprotect.yaml up -d
 ```
 #### コンテナ動作状況の確認
 ```
@@ -214,8 +214,8 @@ root       407     1  0 02:29 ?        00:00:00 tail -f /var/log/elasticsearch/e
 root       559     0  0 02:32 pts/0    00:00:00 ps -aef
 
 一定時間結果して状況が改善しない場合、再度docker-composeを実行してください
-docker-compose -f docker-compose-labnginx.yaml down
-docker-compose -f docker-compose-labnginx.yaml up -d
+docker-compose -f docker-compose-lab-appprotect.yaml down
+docker-compose -f docker-compose-lab-appprotect.yaml up -d
 ``` 
 
 #### NGINX App Protectが正しく動作していることを確認
