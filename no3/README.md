@@ -141,13 +141,82 @@ docker-compose -f docker-compose-labnginx.yaml up -d
 ```
 docker ps 
 ```
+出力結果例
+```
+$ docker ps -a
+CONTAINER ID   IMAGE                COMMAND                  CREATED         STATUS         PORTS                                                                                                                                                           NAMES
+63fd3abc1f0e   sebp/elk:793         "/usr/local/bin/star…"   3 minutes ago   Up 2 minutes   0.0.0.0:5144->5144/tcp, :::5144->5144/tcp, 0.0.0.0:5601->5601/tcp, :::5601->5601/tcp, 5044/tcp, 9300/tcp, 9600/tcp, 0.0.0.0:9200->9200/tcp, :::9200->9200/tcp   app-protect-container_elasticsearch_1
+3777958f5c2c   ianwijaya/hackazon   "supervisord -n"         3 minutes ago   Up 2 minutes   0.0.0.0:8082->80/tcp, :::8082->80/tcp                                                                                                                           app-protect-container_app2_1
+b6e1cbef4bcb   app-protect:latest   "sh /root/entrypoint…"   3 minutes ago   Up 2 minutes   0.0.0.0:80->80/tcp, :::80->80/tcp                                                                                                                               app-protect-container_approtect_1
+d94a3eff6df4   ianwijaya/hackazon   "supervisord -n"         3 minutes ago   Up 2 minutes   0.0.0.0:8081->80/tcp, :::8081->80/tcp                                                                                                                           app-protect-container_app1_1
+
+```
 #### ELKの設定投入
 ```
 ./importkibana.sh 
 ```
-- ※ELKの起動には時間がかかるため、以下のようなエラーとなった場合には少し時間を開けて実行ください   
-- ※docker psの結果が正しいにもかかわらず意図した通りELKの設定ができない場合には、一度dockmer-composeを停止の後、再度実行してください   
-- ※docker exec <container> bash / ps -aef の結果はりつけておく   
+正しく投入された場合の出力
+```
+※ELK起動までに少し時間がかかります。１～２分お待ち下さい
+正しく設定が投入できた場合、JSONの結果が表示される
+$ ./importkibana.sh
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 43277  100  1419  100 41858  15306   440k --:--:-- --:--:-- --:--:--  444k
+{
+  "objects": [
+    {
+      "id": "eb626140-73a6-11ea-9cfb-3598e28db774",
+      "type": "visualization",
+      "error": {
+        "statusCode": 409,
+        "error": "Conflict",
+        "message": "Saved object [visualization/eb626140-73a6-11ea-9cfb-3598e28db774] conflict"
+      }
+    },
+※省略※
+    {
+      "id": "140fbf30-363e-11ea-983a-f74b5d6c2f97",
+      "type": "dashboard",
+      "error": {
+        "statusCode": 409,
+        "error": "Conflict",
+        "message": "Saved object [dashboard/140fbf30-363e-11ea-983a-f74b5d6c2f97] conflict"
+      }
+    }
+  ]
+}
+
+```
+正しく設定の投入ができない場合、以下を参考に実施ください
+```
+スクリプト実行の結果、Connectionが失敗する
+$ ./importkibana.sh
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0 41858    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+curl: (56) Recv failure: Connection reset by peer
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0 57179    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+curl: (56) Recv failure: Connection reset by peer
+
+以下の内容を参考に、elastic , logstash , kibanaのUIDでプロセスが動作していることを確認し、再度実行してください
+$ docker exec -it  $(docker ps -a -f name=elastic  -q) ps -aef
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 02:28 ?        00:00:00 /bin/bash /usr/local/bin/start.s
+root        14     1  0 02:28 ?        00:00:00 /usr/sbin/cron
+elastic+   194     1 17 02:28 ?        00:00:40 /opt/elasticsearch/jdk/bin/java
+elastic+   225   194  0 02:28 ?        00:00:00 /opt/elasticsearch/modules/x-pac
+logstash   394     1 39 02:29 ?        00:01:19 /usr/bin/java -Xms1g -Xmx1g -XX:
+kibana     405     1 24 02:29 ?        00:00:48 /opt/kibana/bin/../node/bin/node
+root       407     1  0 02:29 ?        00:00:00 tail -f /var/log/elasticsearch/e
+root       559     0  0 02:32 pts/0    00:00:00 ps -aef
+
+一定時間結果して状況が改善しない場合、再度docker-composeを実行してください
+docker-compose -f docker-compose-labnginx.yaml down
+docker-compose -f docker-compose-labnginx.yaml up -d
+``` 
 
 #### NGINX App Protectが正しく動作していることを確認
 ```
