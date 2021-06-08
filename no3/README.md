@@ -6,10 +6,15 @@
 * 利用するコマンド： git , docker, docker-compose , jq , sudo, curl
 
 ## UDF コンポーネントへの接続
+### Windows Jump HostへのRDP接続
 Windows Jump HostからCLIの操作を行う場合、以下タブからRDP Clientファイルをダウンロードいただき接続ください
 <br><img src="https://user-images.githubusercontent.com/43058573/121031351-3a086900-c7e5-11eb-8a85-f634aa923d4e.png" alt="RDP" width="200"><br>
+RDPのUser名、パスワードは以下を参照ください
+
+### Linux Hostへの接続
 Docker Hostへの接続は以下メニューを開き利用ください
 <br><img src="https://user-images.githubusercontent.com/43058573/121031353-3a086900-c7e5-11eb-90a9-28283cebd5a9.png" alt="Docker Menu" width="200"><br>
+SSHはSSH鍵認証を用いて接続可能です。手順は以下を参照ください
 
 ## Git clone
 ラボで必要なファイルをGitHubから取得
