@@ -329,6 +329,9 @@ docker logs $(docker ps -f name=approtect -q)
 
 
 ## Kibana操作画面
+### Kibanaへの接続
+以下メニューより「elk」をクリックしてください
+<br><img src="https://user-images.githubusercontent.com/43058573/121283528-404a3280-c916-11eb-8a60-bfde13129dfc.png" alt="Docker Menu" width="200"><br>
 ### Dashboard
 左側メニューよりDashboardを選択し、ご覧になりたい内容を選択ください
 <br><img src="https://user-images.githubusercontent.com/43058573/121031357-3aa0ff80-c7e5-11eb-828d-50d298736837.png" alt="Menu Dashboard" width="150"><br>
