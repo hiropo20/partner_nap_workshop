@@ -1,4 +1,6 @@
 
+
+
 # Lab手順
 
 ## 実施環境
@@ -8,18 +10,19 @@
 ## UDF コンポーネントへの接続
 ### Windows Jump HostへのRDP接続
 Windows Jump HostからCLIの操作を行う場合、以下タブからRDP Clientファイルをダウンロードいただき接続ください
-<br><img src="https://user-images.githubusercontent.com/43058573/121031351-3a086900-c7e5-11eb-8a85-f634aa923d4e.png" alt="RDP" width="200"><br>
+<br><img src="https://user-images.githubusercontent.com/43058573/121283531-417b5f80-c916-11eb-9ff9-8d0e7e8f1aad.png" alt="RDP" width="200"><br>
+
 Windows Jump Hostへログインいただくと、SSHを実行するバッチファイルがありますので、そちらをダブルクリックしDocker_HOSTへ接続ください
 <br><img src="https://user-images.githubusercontent.com/43058573/121170154-c8392980-c88f-11eb-9879-f7bb9c4f13a3.png" alt="ssh"><br>
-RDPのUser名、パスワードはJumpHost > Documentationタブ > Credentialsの項目を参照ください
-<br><img src="https://user-images.githubusercontent.com/43058573/121128683-c0b15a80-c866-11eb-9487-b2c89bede77d.png" alt="Credential" width="150"><br>
-こちらのタブの下の内容を参照ください
+RDPのUser名、パスワードはDETAILSをクリックし、GeneralのタブのCredentialsの項目を参照ください
+<br><img src="https://user-images.githubusercontent.com/43058573/121283534-417b5f80-c916-11eb-88af-9f95c2ced284.png" alt="DETAILS" width="200"><br>
+<img src="https://user-images.githubusercontent.com/43058573/121283535-4213f600-c916-11eb-8a89-67362d7a340b.png" alt="Generals" width="300"><br>
 
 ### Linux Hostへの接続
 Docker Hostへの接続は以下メニューを開き利用ください
-<br><img src="https://user-images.githubusercontent.com/43058573/121031353-3a086900-c7e5-11eb-90a9-28283cebd5a9.png" alt="Docker Menu" width="200"><br>
-Docker HOSTへのSSH接続は、Jump Host経由　または、<br>
-SSH鍵認証を用いて接続可能です。SSH鍵の登録手順は以下を参照ください
+<br><img src="https://user-images.githubusercontent.com/43058573/121283528-404a3280-c916-11eb-8a60-bfde13129dfc.png" alt="Docker Menu" width="200"><br>
+Docker HOSTへのSSH接続は、Jump Host経由　または、SSH鍵認証を用いて接続可能です。SSH鍵の登録手順は以下を参照ください
+***SSH鍵を登録頂いていない場合、SSHはグレーアウトします***
 <br><a href="https://github.com/hiropo20/partner_nap_workshop_secure/blob/main/UDF_SSH_Key.pdf">UDF LAB SSH鍵登録マニュアル</a> (ラボ実施時閲覧可に変更します)<br>
 
 ## Git clone
