@@ -6,6 +6,7 @@
 ## 実施環境
 * 事前にラボ環境へのInviteを行っておりますので、メールをご確認ください
 * 利用するコマンド： git , docker, docker-compose , jq , sudo, curl
+* NGINX Trialライセンスの取得、ラボ実施ユーザのHome Directryへ配置
 
 ## UDF コンポーネントへの接続
 ### Windows Jump HostへのRDP接続
@@ -31,6 +32,16 @@ Docker HOSTへのSSH接続は、Jump Host経由　または、SSH鍵認証を用
 cd ~/
 git clone https://github.com/laurentpf5/nap-partner-campaign
 ```
+
+実行ユーザの確認
+```
+whoami
+
+出力結果がcentosであることを確認してください。
+webshell を利用してrootで操作している場合には、su - centos でユーザを切り替えてください
+```
+
+
 ## NGINX Plus lab
 ### 1. NGINX Plus Container Imageの作成
 #### ディレクトリの移動
@@ -142,7 +153,7 @@ docker build --no-cache -t app-protect .
 ```
 #### 作成したDocker Imageの確認
 ```
-docker images | grep nginxplus
+docker images | grep app-protect
 ```
 
 
@@ -163,7 +174,36 @@ CONTAINER ID   IMAGE                COMMAND                  CREATED         STA
 3777958f5c2c   ianwijaya/hackazon   "supervisord -n"         3 minutes ago   Up 2 minutes   0.0.0.0:8082->80/tcp, :::8082->80/tcp                                                                                                                           app-protect-container_app2_1
 b6e1cbef4bcb   app-protect:latest   "sh /root/entrypoint…"   3 minutes ago   Up 2 minutes   0.0.0.0:80->80/tcp, :::80->80/tcp                                                                                                                               app-protect-container_approtect_1
 d94a3eff6df4   ianwijaya/hackazon   "supervisord -n"         3 minutes ago   Up 2 minutes   0.0.0.0:8081->80/tcp, :::8081->80/tcp                                                                                                                           app-protect-container_app1_1
+```
 
+#### ELKの起動確認
+※ELK起動までに少し時間がかかります。１～２分お待ち下さい
+以下の内容を参考に正常動作を確認してください
+elastic , logstash , kibanaのUIDでプロセスが動作していることを確認し、再度実行してください
+```
+docker exec -it  $(docker ps -a -f name=elastic  -q) ps -aef
+```
+出力結果例
+```
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 02:28 ?        00:00:00 /bin/bash /usr/local/bin/start.s
+root        14     1  0 02:28 ?        00:00:00 /usr/sbin/cron
+elastic+   194     1 17 02:28 ?        00:00:40 /opt/elasticsearch/jdk/bin/java
+elastic+   225   194  0 02:28 ?        00:00:00 /opt/elasticsearch/modules/x-pac
+logstash   394     1 39 02:29 ?        00:01:19 /usr/bin/java -Xms1g -Xmx1g -XX:
+kibana     405     1 24 02:29 ?        00:00:48 /opt/kibana/bin/../node/bin/node
+root       407     1  0 02:29 ?        00:00:00 tail -f /var/log/elasticsearch/e
+root       559     0  0 02:32 pts/0    00:00:00 ps -aef
+```
+ログの結果を確認
+```
+docker logs $(docker ps -a -f name=elastic  -q) | grep running
+```
+出力結果例
+```
+[2021-06-09T04:13:26,731][INFO ][logstash.agent           ] Pipelines running {:count=>1, :running_pipelines=>[:main], :non_running_pipelines=>[]}
+{"type":"log","@timestamp":"2021-06-09T04:14:34Z","tags":["info","http","server","Kibana"],"pid":390,"message":"http server running at http://0.0.0.0:5601"}
+{"type":"log","@timestamp":"2021-06-09T04:14:34Z","tags":["listening","info"],"pid":390,"message":"Server running at http://0.0.0.0:5601"}
 ```
 #### ELKの設定投入
 ```
@@ -171,7 +211,6 @@ d94a3eff6df4   ianwijaya/hackazon   "supervisord -n"         3 minutes ago   Up 
 ```
 正しく投入された場合の出力
 ```
-※ELK起動までに少し時間がかかります。１～２分お待ち下さい
 正しく設定が投入できた場合、JSONの結果が表示される
 $ ./importkibana.sh
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
@@ -202,7 +241,8 @@ $ ./importkibana.sh
 }
 
 ```
-正しく設定の投入ができない場合、以下を参考に実施ください
+ELKが起動しておらず、設定投入がエラーとなった場合以下のような出力になる場合があります
+その場合は前の項目を参考に、ELKの起動を確認してください
 ```
 スクリプト実行の結果、Connectionが失敗する
 $ ./importkibana.sh
@@ -215,17 +255,6 @@ curl: (56) Recv failure: Connection reset by peer
   0 57179    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
 curl: (56) Recv failure: Connection reset by peer
 
-以下の内容を参考に、elastic , logstash , kibanaのUIDでプロセスが動作していることを確認し、再度実行してください
-$ docker exec -it  $(docker ps -a -f name=elastic  -q) ps -aef
-UID        PID  PPID  C STIME TTY          TIME CMD
-root         1     0  0 02:28 ?        00:00:00 /bin/bash /usr/local/bin/start.s
-root        14     1  0 02:28 ?        00:00:00 /usr/sbin/cron
-elastic+   194     1 17 02:28 ?        00:00:40 /opt/elasticsearch/jdk/bin/java
-elastic+   225   194  0 02:28 ?        00:00:00 /opt/elasticsearch/modules/x-pac
-logstash   394     1 39 02:29 ?        00:01:19 /usr/bin/java -Xms1g -Xmx1g -XX:
-kibana     405     1 24 02:29 ?        00:00:48 /opt/kibana/bin/../node/bin/node
-root       407     1  0 02:29 ?        00:00:00 tail -f /var/log/elasticsearch/e
-root       559     0  0 02:32 pts/0    00:00:00 ps -aef
 
 一定時間結果して状況が改善しない場合、再度docker-composeを実行してください
 docker-compose -f docker-compose-lab-appprotect.yaml down
@@ -236,7 +265,7 @@ docker-compose -f docker-compose-lab-appprotect.yaml up -d
 ```
 docker logs $(docker ps -f name=approtect -q)
 ```
-※出力結果例※
+
 
 #### 疎通の確認
 ```
