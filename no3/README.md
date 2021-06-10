@@ -30,7 +30,7 @@ Docker HOSTへのSSH接続は、Jump Host経由　または、SSH鍵認証を用
 ラボで必要なファイルをGitHubから取得
 ```
 cd ~/
-git clone https://github.com/laurentpf5/nap-partner-campaign
+git clone https://github.com/hiropo20/nap-partner-campaign_no2.git
 ```
 
 実行ユーザの確認
