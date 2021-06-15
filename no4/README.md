@@ -258,10 +258,6 @@ vi /etc/nginx/nginx.conf
  app_protect_security_log "/etc/nginx/custom_log_format.json" syslog:server=elasticsearch:5144;
 to
  app_protect_security_log "/etc/nginx/custom_log_format.json" stderr;
-![parm_security_id](https://user-images.githubusercontent.com/43058573/122133503-c7982880-ce77-11eb-92fb-f5fe0a64509e.png)
-![rejected](https://user-images.githubusercontent.com/43058573/122133506-c8c95580-ce77-11eb-8f00-c2c1931de2b7.png)
-![support_id](https://user-images.githubusercontent.com/43058573/122133507-c961ec00-ce77-11eb-9467-ba618f8fd0ec.png)
-
 ```
 #### シェルから抜ける
 ```
@@ -433,11 +429,10 @@ curl -s http://localhost/dummy.jpg | head
 Discoverで攻撃の結果を確認する
 
 `outcome: REJECTED` をフィルタの条件として入力し結果を確認
-
-<img src="" alt="rejected" width="400">
+<br><img src="https://user-images.githubusercontent.com/43058573/122133506-c8c95580-ce77-11eb-8f00-c2c1931de2b7.png" alt="rejected" width="600"><br>
 
 先程確認したSupport IDを参考に`support_id:"  **SUPPORT ID**  "` (Support IDをダブルクォーテーション「"」で括る点に注意) と入力し結果を確認
-<img src="" alt="supportid" width="400">
+<br><img src="https://user-images.githubusercontent.com/43058573/122133507-c961ec00-ce77-11eb-9467-ba618f8fd0ec.png" alt="supportid" width="600"><br>
 
 
 ### 3. Policy の変更3
@@ -505,7 +500,8 @@ Discoverで攻撃の結果を確認する
 
 `request: "*security_id*"` をフィルタの条件として入力し結果を確認
 
-<img src="" alt="rejected" width="400">
+<br><img src="https://user-images.githubusercontent.com/43058573/122133503-c7982880-ce77-11eb-92fb-f5fe0a64509e.png" alt="security_id" width="600"><br>
+
 
 
 
@@ -593,13 +589,6 @@ $ docker logs app-protect-container_approtect-nap-signature_1  2>&1 | grep attac
 DockerFileのポイントも比較
 
 ## BIG-IP AWAF Security Policyのコンバート
-### BIG-IP AWAF上でPolicyの確認
-BIG-IPにログイン
-
-以下GitHubのSecurity Policy(XML)をローカルにダウンロード
-
-手順に従ってBIG-IPでインポート
-
 ### NGINX App ProtectのPolicyにコンバート
 ポリシーコンバートを行うコンテナの作成
 ```
@@ -713,6 +702,25 @@ $ docker logs app-protect-container_approtect-nap-convertedpolicy_1  2>&1 | grep
 2021/06/15 14:45:22 [notice] 13#13: APP_PROTECT policy '/Common/Demo_NGINX_Policy' from: /etc/nginx/labpolicy.json compiled successfully
 ```
 
+### BIG-IP AWAF上でPolicyの確認 (お客様環境のBIG-IPでお試しください)
+
+#### 以下GitHubのSecurity Policy(XML)をローカルにダウンロード
+hakazon.xmlをクリック
+<br><img src="https://user-images.githubusercontent.com/43058573/122134293-43df3b80-ce79-11eb-96c5-8264c84cd3a8.png" alt="XML_file" width="600"><br>
+rawで表示し、右クリックで保存
+<br><img src="https://user-images.githubusercontent.com/43058573/122134294-4477d200-ce79-11eb-8617-fa5cc6ebbee5.png" alt="download" width="600"><br>
+適切な場所に保存
+<br><img src="https://user-images.githubusercontent.com/43058573/122134295-4477d200-ce79-11eb-9259-6d9026bf4e1e.png" alt="save" width="600"><br>
+
+#### BIG-IPにログインし手順に従ってBIG-IPでインポート
+適切なアカウントでログイン
+<br><img src="https://user-images.githubusercontent.com/43058573/122134306-46419580-ce79-11eb-96b2-f18ddea08c5f.png" alt="login" width="600"><br>
+<br><img src="https://user-images.githubusercontent.com/43058573/122134289-42ae0e80-ce79-11eb-89e7-5acedb7133b1.png" alt="top" width="600"><br>
+<br><img src="https://user-images.githubusercontent.com/43058573/122134308-46da2c00-ce79-11eb-9242-fa52223ef394.png" alt="menu" width="600"><br>
+<br><img src="https://user-images.githubusercontent.com/43058573/122134297-45106880-ce79-11eb-946d-9fcd978fdd88.png" alt="policy1" width="600"><br>
+<br><img src="https://user-images.githubusercontent.com/43058573/122134300-45a8ff00-ce79-11eb-9d16-e2bc1e2ac471.png" alt="policy2" width="600"><br>
+<br><img src="https://user-images.githubusercontent.com/43058573/122134305-45a8ff00-ce79-11eb-9e91-cd9f5e945417.png" alt="policy3" width="600"><br>
+<br><img src="" alt="policy3" width="600"><br>
 
 
 
