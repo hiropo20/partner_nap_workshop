@@ -227,9 +227,65 @@ EOF
 #### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
 
 
+### 4. Security Log 
+セキュリティログの設定内容、パラメータについては以下をご覧ください
+[Available Security Log Attributes](https://docs.nginx.com/nginx-app-protect/configuration/#available-security-log-attributes)
+
+#### NGINX App Protectコンテナのログ設定ファイルを修正
+
+```
+docker exec -it $(docker ps -f name=approtect -q) bash
+
+vi /etc/nginx/custom_log_format.json
+
+以下内容に変更
+{
+    "filter": {
+        "request_type": "illegal"
+    },
+    "content": {
+        "format": "user-defined",
+        "format_string": "NAP support ID: %support_id% - NAP Violation: %violations% - NAP outcome: %outcome% - NAP reason: %outcome_reason% - NAP policy name: %policy_name% - NAP Rating: %violation_rating% - NAP version: %version% NGINX request: %request% NGINX status: %request_status%", 
+        "max_request_size": "any",
+        "max_message_size": "10k"
+    }
+}
 
 
+vi /etc/nginx/nginx.conf
 
+以下の内容の通り変更（以下変更の他、宛先ファイルなど自由に指定可能)
+ app_protect_security_log "/etc/nginx/custom_log_format.json" syslog:server=elasticsearch:5144;
+to
+ app_protect_security_log "/etc/nginx/custom_log_format.json" stderr;
+
+
+```
+#### シェルから抜ける
+```
+exit
+```
+#### 設定の読み込み
+```
+docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
+```
+
+#### 疎通の確認
+```
+curl http://localhost/ | head
+curl http://localhost/?a=%3Cscript%3E | head
+```
+※現在ブロックする設定ではないため、WebPageの内容が出力される
+
+#### ログの確認
+```
+docker logs $(docker ps -f name=approtect -q)
+```
+定義したフォーマットでログがstderrに出力され、docker logsで表示できることを確認
+
+
+## NGINX App Protect Lab Policy management
+### 
 ### =================================================================================
 
 ### 4. NGINX App Protectのセキュリティポリシー変更
