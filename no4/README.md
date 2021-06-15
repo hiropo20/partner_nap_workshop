@@ -224,7 +224,7 @@ EOF
 
 ./badtraffic.sh
 ```
-#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
+#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no4/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
 
 
 ### 4. Security Log 
@@ -354,7 +354,7 @@ curl -s http://localhost/?a=%3Cscript%3E | head
 <html><head><title>Request Rejected</title></head><body>The requested URL was rejected. Please consult with your administrator.<br><br>Your support ID is: 787019502751076693<br><br><a href='javascript:history.back();'>[Go Back]</a></body></html>
 
 ```
-#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
+#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no4/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
 Discoverで攻撃の結果を確認する
 
 `outcome: REJECTED` をフィルタの条件として入力し結果を確認
@@ -427,7 +427,7 @@ curl -s http://localhost/dummy.jpg | head
 <html><head><title>Request Rejected</title></head><body>The requested URL was rejected. Please consult with your administrator.<br><br>Your support ID is: 787019502751076693<br><br><a href='javascript:history.back();'>[Go Back]</a></body></html>
 
 ```
-#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
+#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no4/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
 Discoverで攻撃の結果を確認する
 
 `outcome: REJECTED` をフィルタの条件として入力し結果を確認
@@ -498,7 +498,7 @@ curl -s "http://localhost/?security_id=5364-0756-2298-8054?x=1&y=2" | head
 ```
 ※現在ブロックする設定ではないため、WebPageの内容が出力される
 
-#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
+#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no4/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
 Discoverで攻撃の結果を確認する
 
 `request: "*security_id*"` をフィルタの条件として入力し結果を確認
@@ -506,32 +506,15 @@ Discoverで攻撃の結果を確認する
 <img src="" alt="rejected" width="400">
 
 
-## BIG-IP AWAF Security Policyのコンバート
-### BIG-IP AWAF上でPolicyの確認
-BIG-IPにログイン
-
-以下GitHubのSecurity Policy(XML)をローカルにダウンロード
-
-手順に従ってBIG-IPでインポート
-
-### NGINX App ProtectのPolicyにコンバート
-
-```
-docker build -f Dockerfile-Converter -t policy-converter 
-```
-
-```
-$ docker images | grep policy-converter
-policy-converter        latest     50dc92c3742f   40 seconds ago      526MB
-```
 
 ## コンテナ内のSignature Database 
-### 1. 
+### Sinagureがアップデートされたコンテナの作成
 
 ```
 docker build -f Dockerfile-attack-signatures -t app-protect-signature .
 ```
 
+コンテナが生成できたことを確認
 ```
 docker images | grep app-protect
 
@@ -541,13 +524,33 @@ app-protect-signature   latest     411b37584ef5   3 minutes ago   636MB
 app-protect             latest     2ab5a8cac274   3 hours ago     622MB
 ```
 
+コンテナを起動するための内容を確認
+
+```
+$ cat docker-compose-nap-signature.yaml
+version: '3'
+services:
+    approtect-nap-signature:
+        image: app-protect-signature:latest
+        volumes:
+            - ./custom_log_format.json:/etc/nginx/custom_log_format.json
+            - ./labpolicy.json:/etc/nginx/labpolicy.json
+            - ./nginx.conf-sig:/etc/nginx/nginx.conf
+            - ./nginx-repo.crt:/etc/ssl/nginx/nginx-repo.crt
+            - ./nginx-repo.key:/etc/ssl/nginx/nginx-repo.key
+        ports:
+            - "8001:80"
+
+```
+実行
+
 ```
 $ docker-compose -f docker-compose-nap-signature.yaml up -d
 WARNING: Found orphan containers (app-protect-container_approtect_1, app-protect-container_app1_1, app-protect-container_elasticsearch_1, app-protect-container_app2_1, app-protect-container_approtect-nap-convertedpolicy_1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.
 Creating app-protect-container_approtect-nap-signature_1 ... done
 
 ```
-
+以下の通り、正しく起動していることを確認
 ```
 $ docker ps | grep approtect-nap-signature
 d37d57824c51   app-protect-signature:latest   "sh /entrypoint.sh"      9 seconds ago       Up 7 seconds       0.0.0.0:8001->80/tcp, :::8001->80/tcp    app-protect-container_approtect-nap-signature_1
@@ -584,17 +587,54 @@ $ docker logs app-protect-container_approtect_1 2>&1 | grep attack_signatures_pa
 $ docker logs app-protect-container_approtect-nap-signature_1  2>&1 | grep attack_signatures_package
 2021/06/15 14:54:10 [notice] 14#14: APP_PROTECT { "event": "configuration_load_success", "software_version": "3.512.0", "user_signatures_packages":[],"attack_signatures_package":{"revision_datetime":"2021-06-11T14:07:02Z","version":"2021.06.11"},"completed_successfully":true,"threat_campaigns_package":{"revision_datetime":"2021-06-14T13:14:59Z","version":"2021.06.14"}}
 ```
+DockerFileのポイントも比較
 
-### Policy Convert
+## BIG-IP AWAF Security Policyのコンバート
+### BIG-IP AWAF上でPolicyの確認
+BIG-IPにログイン
+
+以下GitHubのSecurity Policy(XML)をローカルにダウンロード
+
+手順に従ってBIG-IPでインポート
+
+### NGINX App ProtectのPolicyにコンバート
+ポリシーコンバートを行うコンテナの作成
+```
+docker build -f Dockerfile-Converter -t policy-converter .
+```
+正しくできている
+```
+$ docker images | grep policy-converter
+policy-converter        latest     50dc92c3742f   40 seconds ago      526MB
+```
+以下の通りファイルを作成
+```
+$ cat docker-compose-nap-convertedpolicy.yaml
+version: '3'
+services:
+    approtect-nap-convertedpolicy:
+        image: app-protect:latest
+        volumes:
+            - ./custom_log_format.json:/etc/nginx/custom_log_format.json
+            - ./convertedpolicy.json:/etc/nginx/labpolicy.json
+            - ./nginx.conf:/etc/nginx/nginx.conf
+            - ./nginx-repo.crt:/etc/ssl/nginx/nginx-repo.crt
+            - ./nginx-repo.key:/etc/ssl/nginx/nginx-repo.key
+        ports:
+            - "8002:80"
+```
+
+BIG-IPポリシーファイルの配置場所
 ```
 mkdir  /var/tmp/convert
 ```
+XMLを配置
 ```
 $ cp policy.xml /var/tmp/convert
 $ ls /var/tmp/convert
 policy.xml
 ```
-
+コンバートの実行
 ```
 docker run -v /var/tmp/convert:/var/tmp/convert policy-converter:latest /opt/app_protect/bin/convert-policy -i /var/tmp/convert/policy.xml -o /var/tmp/convert/policy.json | jq
 
@@ -641,25 +681,30 @@ docker run -v /var/tmp/convert:/var/tmp/convert policy-converter:latest /opt/app
 }
 
 ```
-
+コンバートされたポリシー情報を確認
 ```
 $ grep Demo_NGINX_Policy /var/tmp/convert/policy.json
       "fullPath" : "/Common/Demo_NGINX_Policy",
       "name" : "Demo_NGINX_Policy",
 
 ```
+コンバートされたポリシーをコピー
 ```
 cp /var/tmp/convert/policy.json convertedpolicy.json
 ```
+
+コンバート済みポリシーをNAPで参照し、起動
 ```
 $ docker-compose -f docker-compose-nap-convertedpolicy.yaml up -d
 WARNING: Found orphan containers (app-protect-container_app2_1, app-protect-container_elasticsearch_1, app-protect-container_app1_1, app-protect-container_approtect_1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.
 Recreating app-protect-container_approtect-nap-convertedpolicy_1 ... done
 ```
+コンバート済みポリシーをインポートしたNAPが起動しているか確認
 ```
 $ docker ps | grep approtect-nap-convertedpolicy
 84b8084c2e62   app-protect:latest             "sh /root/entrypoint…"  8 minutes ago       Up 8 minutes       0.0.0.0:8002->80/tcp, :::8002->80/tcp    app-protect-container_approtect-nap-convertedpolicy_1    
 ```
+正しくポリシーが読み込まれていることがわかる
 ```
 $ docker logs app-protect-container_approtect-nap-convertedpolicy_1  2>&1 | grep policy
 2021/06/15 14:45:22 [notice] 13#13: APP_PROTECT policy '/Common/Demo_NGINX_Policy' from: /etc/nginx/labpolicy.json compiled successfully
