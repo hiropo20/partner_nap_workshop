@@ -568,6 +568,7 @@ app-protect-plugin.x86_64                 3.512.0-1.el7.ngx              @nginx-
 
 
 Signature Update済みコンテナ
+[centos@ip-10-1-1-5 ~]$  docker exec -it app-protect-container_approtect_1 bash
 # yum list | grep app-protect
 app-protect.x86_64                        24+3.512.0-1.el7.ngx           @nginx-plus
 app-protect-attack-signatures.x86_64      2021.06.11-1.el7.ngx           @app-protect-security-updates
