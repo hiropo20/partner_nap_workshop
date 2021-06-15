@@ -173,8 +173,8 @@ docker logs $(docker ps -f name=approtect -q)
 
 #### 疎通の確認
 ```
-curl http://localhost/ | head
-curl http://localhost/?a=%3Cscript%3E | head
+curl -s http://localhost/ | head
+curl -s http://localhost/?a=%3Cscript%3E | head
 ```
 ※現在ブロックする設定ではないため、WebPageの内容が出力される
 
@@ -272,8 +272,8 @@ docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
 
 #### 疎通の確認
 ```
-curl http://localhost/ | head
-curl http://localhost/?a=%3Cscript%3E | head
+curl -s http://localhost/ | head
+curl -s http://localhost/?a=%3Cscript%3E | head
 ```
 ※現在ブロックする設定ではないため、WebPageの内容が出力される
 
@@ -287,7 +287,7 @@ docker logs $(docker ps -f name=approtect -q)
 ## NGINX App Protect Lab Policy management
 ### 1. Policy の変更1
 
-NGINX App Protectコンテナのポリシー設定ファイルを修正
+#### NGINX App Protectの設定ファイルを修正
 
 ```
 docker exec -it $(docker ps -f name=approtect -q) bash
@@ -366,8 +366,7 @@ Discoverで攻撃の結果を確認する
 
 
 ### 2. Policy の変更2
-
-NGINX App Protectコンテナのポリシー設定ファイルを修正
+#### NGINX App Protectの設定ファイルを修正
 
 ```
 docker exec -it $(docker ps -f name=approtect -q) bash
@@ -383,6 +382,15 @@ vi /etc/nginx/labpolicy.json
         },
         "applicationLanguage": "utf-8",
         "enforcementMode": "blocking",
+        "blocking-settings": {
+            "violations": [
+                {
+                    "name": "VIOL_FILETYPE",
+                    "alarm": true,
+                    "block": true
+                }
+            ]
+        },
         "filetypes": [
             {
                 "name": "jpg",
@@ -390,6 +398,80 @@ vi /etc/nginx/labpolicy.json
                 "allowed": false
             }
         ]
+    }
+
+
+```
+
+
+#### シェルから抜ける
+```
+exit
+```
+#### 設定の読み込み
+```
+docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
+```
+#### ログの確認
+```
+docker logs $(docker ps -f name=approtect -q)
+```
+
+#### 攻撃リクエストを実行し、その結果を確認する
+curlコマンドを実行し、出力を確認
+```
+curl -s http://localhost/dummy.jpg | head
+
+以下のようなBlock Pageが表示される。Support ID(例：787019502751076693)を控えておく
+
+<html><head><title>Request Rejected</title></head><body>The requested URL was rejected. Please consult with your administrator.<br><br>Your support ID is: 787019502751076693<br><br><a href='javascript:history.back();'>[Go Back]</a></body></html>
+
+```
+#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
+Discoverで攻撃の結果を確認する
+
+`outcome: REJECTED` をフィルタの条件として入力し結果を確認
+
+<img src="" alt="rejected" width="400">
+
+先程確認したSupport IDを参考に`support_id:"  **SUPPORT ID**  "` (Support IDをダブルクォーテーション「"」で括る点に注意) と入力し結果を確認
+<img src="" alt="supportid" width="400">
+
+
+### 3. Policy の変更3
+#### NGINX App Protectの設定ファイルを修正
+
+```
+docker exec -it $(docker ps -f name=approtect -q) bash
+grep policy_file /etc/nginx/nginx.conf
+vi /etc/nginx/labpolicy.json
+
+変更内容
+{
+    "name": "policy-dataguard",
+    "template": {
+        "name": "POLICY_TEMPLATE_NGINX_BASE"
+    },
+    "applicationLanguage": "utf-8",
+    "enforcementMode": "blocking",
+    "blocking-settings": {
+        "violations": [
+            {
+                "name": "VIOL_DATA_GUARD",
+                "alarm": true,
+                "block": false
+            }
+        ]
+    },
+    "data-guard": {
+        "enabled": false,
+        "maskData": true,
+        "creditCardNumbers": true,
+        "usSocialSecurityNumbers": true,
+        "enforcementMode": "ignore-urls-in-list",
+        "enforcementUrls": [],
+        "lastCcnDigitsToExpose": 4,
+        "lastSsnDigitsToExpose": 4
     }
 }
 
@@ -410,28 +492,18 @@ docker logs $(docker ps -f name=approtect -q)
 ```
 
 #### 攻撃リクエストを実行し、その結果を確認する
-badtrafficの実行
-```
-./badtraffic.sh
-```
 curlコマンドを実行し、出力を確認
 ```
-curl -s http://localhost/?a=%3Cscript%3E | head
-
-以下のようなBlock Pageが表示される。Support ID(例：787019502751076693)を控えておく
-
-<html><head><title>Request Rejected</title></head><body>The requested URL was rejected. Please consult with your administrator.<br><br>Your support ID is: 787019502751076693<br><br><a href='javascript:history.back();'>[Go Back]</a></body></html>
-
+curl -s "http://localhost/?security_id=5364-0756-2298-8054?x=1&y=2" | head
 ```
+※現在ブロックする設定ではないため、WebPageの内容が出力される
+
 #### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
 Discoverで攻撃の結果を確認する
 
-`outcome: REJECTED` をフィルタの条件として入力し結果を確認
+`request: "*security_id*"` をフィルタの条件として入力し結果を確認
 
 <img src="" alt="rejected" width="400">
-
-先程確認したSupport IDを参考に`support_id:"  **SUPPORT ID**  "` (Support IDをダブルクォーテーション「"」で括る点に注意) と入力し結果を確認
-<img src="" alt="supportid" width="400">
 
 
 ### =================================================================================
