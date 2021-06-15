@@ -506,354 +506,147 @@ Discoverで攻撃の結果を確認する
 <img src="" alt="rejected" width="400">
 
 
-### =================================================================================
+## BIG-IP AWAF Security Policyのコンバート
+### BIG-IP AWAF上でPolicyの確認
+BIG-IPにログイン
 
-### 4. NGINX App Protectのセキュリティポリシー変更
-NGINX App Protectコンテナのポリシー設定ファイルを修正
+以下GitHubのSecurity Policy(XML)をローカルにダウンロード
 
-```
-docker exec -it $(docker ps -f name=approtect -q) bash
-grep policy_file /etc/nginx/nginx.conf
-vi /etc/nginx/labpolicy.json
+手順に従ってBIG-IPでインポート
 
-変更内容
-  "enforcementMode": "transparent"
-to
-  "enforcementMode": "blocking"
-```
-#### シェルから抜ける
-```
-exit
-```
-#### 設定の読み込み
-```
-docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
-```
-#### ログの確認
-```
-docker logs $(docker ps -f name=approtect -q)
-```
-
-#### いくつかの攻撃リクエストを実行し、その結果を確認する
-```
-./badtraffic.sh
-```
-#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
-
-
-## ---------------------------------------------------------------------------------------
-## NGINX Plus lab
-### 1. NGINX Plus Container Imageの作成
-#### ディレクトリの移動
-```
-cd ~/nap-partner-campaign/nplus-container
-```
-#### NGINX Licenseファイルのコピー
-```
-cp ~/nginx-repo.crt .
-cp ~/nginx-repo.key .
-```
-#### Dockerfileの内容確認
-```
-less Dockerfile
-```
-#### NGINX Plus ContainerのBuild
-```
-docker build --no-cache -t nginxplus .
-```
-#### 作成したDocker Imageの確認
-```
-docker images | grep nginx
-```
-出力結果例
-```
-$ docker images | grep nginxplus
-nginxplus            latest        e36a40c4f511   40 seconds ago   88.1MB
-```
-
-### 2. NGINX Container 動作確認
-#### ラボ環境の実行
-```
-docker-compose -f docker-compose-labnginx.yaml up -d 
-```
-#### コンテナ動作状況の確認
-```
-docker ps 
-```
-出力結果例
-```
-CONTAINER ID   IMAGE                COMMAND                  CREATED         STATUS          PORTS                                               NAMES
-deafd73eac5f   nginxplus:latest     "nginx -g 'daemon of…"   3 minutes ago   Up 57 seconds   80/tcp, 0.0.0.0:8000->8000/tcp, :::8000->8000/tcp   nplus-container_nginxplus_1
-b2ba5ea66ff1   ianwijaya/hackazon   "supervisord -n"         3 minutes ago   Up 3 minutes    0.0.0.0:8081->80/tcp, :::8081->80/tcp               nplus-container_app1_1
-ecf015fa2d2a   ianwijaya/hackazon   "supervisord -n"         3 minutes ago   Up 3 minutes    0.0.0.0:8082->80/tcp, :::8082->80/tcp               nplus-container_app2_1
+### NGINX App ProtectのPolicyにコンバート
 
 ```
-正しくNGINX Plus Containerが起動しない場合、以下内容を参考に再度docker-composeを実行ください
+docker build -f Dockerfile-Converter -t policy-converter 
 ```
 
-$ docker ps
-CONTAINER ID   IMAGE                COMMAND            CREATED          STATUS         PORTS                                   NAMES
-b2ba5ea66ff1   ianwijaya/hackazon   "supervisord -n"   11 seconds ago   Up 7 seconds   0.0.0.0:8081->80/tcp, :::8081->80/tcp   nplus-container_app1_1
-ecf015fa2d2a   ianwijaya/hackazon   "supervisord -n"   11 seconds ago   Up 7 seconds   0.0.0.0:8082->80/tcp, :::8082->80/tcp   nplus-container_app2_1
-
-
-$ docker ps -a
-CONTAINER ID   IMAGE                COMMAND                  CREATED          STATUS                      PORTS                                   NAM                                                             ES
-deafd73eac5f   nginxplus:latest     "nginx -g 'daemon of…"   15 seconds ago   Exited (1) 13 seconds ago                                           nplus-container_nginxplus_1
-b2ba5ea66ff1   ianwijaya/hackazon   "supervisord -n"         15 seconds ago   Up 10 seconds               0.0.0.0:8081->80/tcp, :::8081->80/tcp   nplus-container_app1_1
-ecf015fa2d2a   ianwijaya/hackazon   "supervisord -n"         15 seconds ago   Up 10 seconds               0.0.0.0:8082->80/tcp, :::8082->80/tcp   nplus-container_app2_1
-
-nginxplus が Exit していることが確認できる
-
-nginxplusのログを確認
-
-$ docker logs $(docker ps -a -f name=nginxplus  -q)
-2021/06/08 02:07:43 [emerg] 1#1: host not found in upstream "app1:80" in /etc/nginx/nginx.conf:26
-nginx: [emerg] host not found in upstream "app1:80" in /etc/nginx/nginx.conf:26
-
-docker-compsoe を再度実行
-$ docker-compose -f docker-compose-labnginx.yaml up -d
-nplus-container_app2_1 is up-to-date
-Starting nplus-container_nginxplus_1 ...
-Starting nplus-container_nginxplus_1 ... done
-
-$ docker ps -a -f name=nginxplus
-CONTAINER ID   IMAGE              COMMAND                  CREATED         STATUS         PORTS                                               NAMES
-deafd73eac5f   nginxplus:latest   "nginx -g 'daemon of…"   7 minutes ago   Up 5 minutes   80/tcp, 0.0.0.0:8000->8000/tcp, :::8000->8000/tcp   nplus-container_nginxplus_1
-
 ```
-#### 疎通の確認
-```
-curl -s http://localhost:8000/ | head
-```
-#### ラボ環境の停止
-```
-docker-compose -f docker-compose-labnginx.yaml down
+$ docker images | grep policy-converter
+policy-converter        latest     50dc92c3742f   40 seconds ago      526MB
 ```
 
-## NGINX App Protect lab
-### 1. NGINX Plus + NGINX App Protect Container Imageの作成
+## コンテナ内のSignature Database 
+### 1. 
 
-#### ディレクトリの移動
 ```
-cd ~/nap-partner-campaign/app-protect-container
+docker build -f Dockerfile-attack-signatures -t app-protect-signature .
 ```
-#### NGINX Licenseファイルのコピー
-```
-cp ~/nginx-repo.crt .
-cp ~/nginx-repo.key .
-```
-#### Dockerfileの内容確認
-```
-less Dockerfile
-```
-#### NGINX Plus + NGINX App Protect ContainerのBuild
-```
-docker build --no-cache -t app-protect .
-```
-#### 作成したDocker Imageの確認
+
 ```
 docker images | grep app-protect
+
+app-protect-signature が追加されていることを確認
+
+app-protect-signature   latest     411b37584ef5   3 minutes ago   636MB
+app-protect             latest     2ab5a8cac274   3 hours ago     622MB
+```
+
+```
+$ docker-compose -f docker-compose-nap-signature.yaml up -d
+WARNING: Found orphan containers (app-protect-container_approtect_1, app-protect-container_app1_1, app-protect-container_elasticsearch_1, app-protect-container_app2_1, app-protect-container_approtect-nap-convertedpolicy_1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.
+Creating app-protect-container_approtect-nap-signature_1 ... done
+
+```
+
+```
+$ docker ps | grep approtect-nap-signature
+d37d57824c51   app-protect-signature:latest   "sh /entrypoint.sh"      9 seconds ago       Up 7 seconds       0.0.0.0:8001->80/tcp, :::8001->80/tcp    app-protect-container_approtect-nap-signature_1
+
 ```
 
 
-### 2. NGINX Plus + NGINX App Protect 動作確認
-#### ラボ環境の実行
 ```
-docker-compose -f docker-compose-lab-appprotect.yaml up -d
-```
-#### コンテナ動作状況の確認
-```
-docker ps 
-```
-出力結果例
-```
-$ docker ps -a
-CONTAINER ID   IMAGE                COMMAND                  CREATED         STATUS         PORTS                                                                                                                                                           NAMES
-63fd3abc1f0e   sebp/elk:793         "/usr/local/bin/star…"   3 minutes ago   Up 2 minutes   0.0.0.0:5144->5144/tcp, :::5144->5144/tcp, 0.0.0.0:5601->5601/tcp, :::5601->5601/tcp, 5044/tcp, 9300/tcp, 9600/tcp, 0.0.0.0:9200->9200/tcp, :::9200->9200/tcp   app-protect-container_elasticsearch_1
-3777958f5c2c   ianwijaya/hackazon   "supervisord -n"         3 minutes ago   Up 2 minutes   0.0.0.0:8082->80/tcp, :::8082->80/tcp                                                                                                                           app-protect-container_app2_1
-b6e1cbef4bcb   app-protect:latest   "sh /root/entrypoint…"   3 minutes ago   Up 2 minutes   0.0.0.0:80->80/tcp, :::80->80/tcp                                                                                                                               app-protect-container_approtect_1
-d94a3eff6df4   ianwijaya/hackazon   "supervisord -n"         3 minutes ago   Up 2 minutes   0.0.0.0:8081->80/tcp, :::8081->80/tcp                                                                                                                           app-protect-container_app1_1
+利用していたAppProtectはコンテナ作成時のSignature Updateを実施していない
+$ docker logs app-protect-container_approtect_1 2>&1 | grep attack_signatures_package
+2021/06/15 12:48:46 [notice] 13#13: APP_PROTECT { "event": "configuration_load_success", "software_version": "3.512.0", "user_signatures_packages":[],"attack_signatures_package":{"revision_datetime":"2019-07-16T12:21:31Z"},"completed_successfully":true,"threat_campaigns_package":{}}
+2021/06/15 12:49:16 [notice] 13#13: APP_PROTECT { "event": "configuration_load_success", "software_version": "3.512.0", "user_signatures_packages":[],"attack_signatures_package":{"revision_datetime":"2019-07-16T12:21:31Z"},"completed_successfully":true,"threat_campaigns_package":{}}
+
+今回作成したコンテナはSignature Updateを行っている
+$ docker logs app-protect-container_approtect-nap-signature_1  2>&1 | grep attack_signatures_package
+2021/06/15 14:54:10 [notice] 14#14: APP_PROTECT { "event": "configuration_load_success", "software_version": "3.512.0", "user_signatures_packages":[],"attack_signatures_package":{"revision_datetime":"2021-06-11T14:07:02Z","version":"2021.06.11"},"completed_successfully":true,"threat_campaigns_package":{"revision_datetime":"2021-06-14T13:14:59Z","version":"2021.06.14"}}
 ```
 
-#### ELKの起動確認
-※ELK起動までに少し時間がかかります。１～２分お待ち下さい
-以下の内容を参考に正常動作を確認してください
-elastic , logstash , kibanaのUIDでプロセスが動作していることを確認し、再度実行してください
+### Policy Convert
 ```
-docker exec -it  $(docker ps -a -f name=elastic  -q) ps -aef
+mkdir  /var/tmp/convert
 ```
-出力結果例
 ```
-UID        PID  PPID  C STIME TTY          TIME CMD
-root         1     0  0 02:28 ?        00:00:00 /bin/bash /usr/local/bin/start.s
-root        14     1  0 02:28 ?        00:00:00 /usr/sbin/cron
-elastic+   194     1 17 02:28 ?        00:00:40 /opt/elasticsearch/jdk/bin/java
-elastic+   225   194  0 02:28 ?        00:00:00 /opt/elasticsearch/modules/x-pac
-logstash   394     1 39 02:29 ?        00:01:19 /usr/bin/java -Xms1g -Xmx1g -XX:
-kibana     405     1 24 02:29 ?        00:00:48 /opt/kibana/bin/../node/bin/node
-root       407     1  0 02:29 ?        00:00:00 tail -f /var/log/elasticsearch/e
-root       559     0  0 02:32 pts/0    00:00:00 ps -aef
+$ cp policy.xml /var/tmp/convert
+$ ls /var/tmp/convert
+policy.xml
 ```
-ログの結果を確認
+
 ```
-docker logs $(docker ps -a -f name=elastic  -q) | grep running
-```
-出力結果例
-```
-[2021-06-09T04:13:26,731][INFO ][logstash.agent           ] Pipelines running {:count=>1, :running_pipelines=>[:main], :non_running_pipelines=>[]}
-{"type":"log","@timestamp":"2021-06-09T04:14:34Z","tags":["info","http","server","Kibana"],"pid":390,"message":"http server running at http://0.0.0.0:5601"}
-{"type":"log","@timestamp":"2021-06-09T04:14:34Z","tags":["listening","info"],"pid":390,"message":"Server running at http://0.0.0.0:5601"}
-```
-#### ELKの設定投入
-```
-./importkibana.sh 
-```
-正しく投入された場合の出力
-```
-正しく設定が投入できた場合、JSONの結果が表示される
-$ ./importkibana.sh
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100 43277  100  1419  100 41858  15306   440k --:--:-- --:--:-- --:--:--  444k
+docker run -v /var/tmp/convert:/var/tmp/convert policy-converter:latest /opt/app_protect/bin/convert-policy -i /var/tmp/convert/policy.xml -o /var/tmp/convert/policy.json | jq
+
+以下の様にNAPのSecurity Policyコンバート際の警告、出力結果の情報を確認してください
 {
-  "objects": [
-    {
-      "id": "eb626140-73a6-11ea-9cfb-3598e28db774",
-      "type": "visualization",
-      "error": {
-        "statusCode": 409,
-        "error": "Conflict",
-        "message": "Saved object [visualization/eb626140-73a6-11ea-9cfb-3598e28db774] conflict"
-      }
-    },
-※省略※
-    {
-      "id": "140fbf30-363e-11ea-983a-f74b5d6c2f97",
-      "type": "dashboard",
-      "error": {
-        "statusCode": 409,
-        "error": "Conflict",
-        "message": "Saved object [dashboard/140fbf30-363e-11ea-983a-f74b5d6c2f97] conflict"
-      }
-    }
-  ]
+  "warnings": [
+    "Default header '*-bin' cannot be deleted.",
+    "Traffic Learning, Policy Building, and staging are unsupported",
+    "Element '/plain-text-profiles' is unsupported.",
+    "/signature-settings/signatureStaging must be 'false' (was 'true').",
+    "/csrf-urls/enforcementAction value 'verify-csrf-token' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_BLOCKING_CONDITION' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_BRUTE_FORCE' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_CONVICTION' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_CSRF_EXPIRED' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_GEOLOCATION' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_HOSTNAME_MISMATCH' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_MALICIOUS_DEVICE' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_MALICIOUS_IP' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_REDIRECT' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_SESSION_AWARENESS' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_WEBSOCKET_BINARY_MESSAGE_LENGTH' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_WEBSOCKET_EXTENSION' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_WEBSOCKET_FRAMES_PER_MESSAGE_COUNT' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_WEBSOCKET_FRAME_LENGTH' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_WEBSOCKET_TEXT_NULL_VALUE' is unsupported.",
+    "/blocking-settings/violations/name value 'VIOL_XML_SCHEMA' is unsupported.",
+    "/blocking-settings/http-protocols/description value 'Several Content-Length headers' is unsupported.",
+    "/blocking-settings/http-protocols/description value 'No Host header in HTTP/1.1 request' is unsupported.",
+    "/blocking-settings/http-protocols/description value 'CRLF characters before request start' is unsupported.",
+    "/blocking-settings/http-protocols/description value 'Content length should be a positive number' is unsupported.",
+    "/blocking-settings/http-protocols/description value 'Bad host header value' is unsupported.",
+    "/general/enableEventCorrelation must be 'false' (was 'true').",
+    "/urls/performStaging value true is unsupported",
+    "Element '/websocket-urls' is unsupported.",
+    "/protocolIndependent must be 'true' (was 'false').",
+    "Element '/redirection-protection' is unsupported.",
+    "Element '/gwt-profiles' is unsupported.",
+    "/signature-sets/learn value true is unsupported"
+  ],
+  "file_size": 23967,
+  "filename": "/var/tmp/convert/policy.json",
+  "completed_successfully": true
 }
 
 ```
-ELKが起動しておらず、設定投入がエラーとなった場合以下のような出力になる場合があります
-その場合は前の項目を参考に、ELKの起動を確認してください
-```
-スクリプト実行の結果、Connectionが失敗する
-$ ./importkibana.sh
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0 41858    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-curl: (56) Recv failure: Connection reset by peer
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0 57179    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-curl: (56) Recv failure: Connection reset by peer
-
-
-一定時間結果して状況が改善しない場合、再度docker-composeを実行してください
-docker-compose -f docker-compose-lab-appprotect.yaml down
-docker-compose -f docker-compose-lab-appprotect.yaml up -d
-``` 
-
-#### NGINX App Protectが正しく動作していることを確認
-```
-docker logs $(docker ps -f name=approtect -q)
-```
-
-
-#### 疎通の確認
-```
-curl http://localhost/ | head
-curl http://localhost/?a=%3Cscript%3E | head
-```
-※現在ブロックする設定ではないため、WebPageの内容が出力される
-
-#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
-
-### 3. NGINX App Protectのログポリシー変更
-#### NGINX App Protectコンテナのログ設定ファイルを修正
 
 ```
-docker exec -it $(docker ps -f name=approtect -q) bash
-grep app_protect_security_log /etc/nginx/nginx.conf
-
-vi /etc/nginx/custom_log_format.json
-
-変更内容
-"request_type": "all"
-to
-"request_type": "illegal" 
-```
-#### シェルから抜ける
-```
-exit
-```
-#### 設定の読み込み
-```
-docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
-```
-#### ログの確認
-```
-docker logs $(docker ps -f name=approtect -q)
-```
-#### いくつかの攻撃リクエストを実行し、その結果を確認する
-```
-cat << EOF > badtraffic.sh
-#!/bin/bash
-curl -s -H "1.2.3.4" http://localhost -o /dev/null
-curl -s http://localhost/%09 -o /dev/null
-curl -s http://localhost/index.bak -o /dev/null
-curl -s http://localhost?a=%3Cscript%3E -o /dev/null
-curl -s http://localhost -o /dev/null
-curl -s http://localhost/\<script\> -o /dev/null
-curl -s -H "Content-Length: -26" http://localhost/ -o /dev/null
-curl -s http://localhost/index.php -o /dev/null
-curl -s http://localhost/test.exe -o /dev/null
-curl -s http://localhost/index.html -o /dev/null
-curl -s http://localhost/basic/index.php -o /dev/null
-EOF
-
-./badtraffic.sh
-```
-#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
-
-### 4. NGINX App Protectのセキュリティポリシー変更
-NGINX App Protectコンテナのポリシー設定ファイルを修正
+$ grep Demo_NGINX_Policy /var/tmp/convert/policy.json
+      "fullPath" : "/Common/Demo_NGINX_Policy",
+      "name" : "Demo_NGINX_Policy",
 
 ```
-docker exec -it $(docker ps -f name=approtect -q) bash
-grep policy_file /etc/nginx/nginx.conf
-vi /etc/nginx/labpolicy.json
-
-変更内容
-  "enforcementMode": "transparent"
-to
-  "enforcementMode": "blocking"
 ```
-#### シェルから抜ける
+cp /var/tmp/convert/policy.json convertedpolicy.json
 ```
-exit
 ```
-#### 設定の読み込み
+$ docker-compose -f docker-compose-nap-convertedpolicy.yaml up -d
+WARNING: Found orphan containers (app-protect-container_app2_1, app-protect-container_elasticsearch_1, app-protect-container_app1_1, app-protect-container_approtect_1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.
+Recreating app-protect-container_approtect-nap-convertedpolicy_1 ... done
 ```
-docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
 ```
-#### ログの確認
+$ docker ps | grep approtect-nap-convertedpolicy
+84b8084c2e62   app-protect:latest             "sh /root/entrypoint…"  8 minutes ago       Up 8 minutes       0.0.0.0:8002->80/tcp, :::8002->80/tcp    app-protect-container_approtect-nap-convertedpolicy_1    
 ```
-docker logs $(docker ps -f name=approtect -q)
+```
+$ docker logs app-protect-container_approtect-nap-convertedpolicy_1  2>&1 | grep policy
+2021/06/15 14:45:22 [notice] 13#13: APP_PROTECT policy '/Common/Demo_NGINX_Policy' from: /etc/nginx/labpolicy.json compiled successfully
 ```
 
-#### いくつかの攻撃リクエストを実行し、その結果を確認する
-```
-./badtraffic.sh
-```
-#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
+
 
 
 
