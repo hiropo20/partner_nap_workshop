@@ -705,9 +705,10 @@ $ docker logs app-protect-container_approtect-nap-convertedpolicy_1  2>&1 | grep
 hakazon.xmlをクリック
 <br><img src="https://user-images.githubusercontent.com/43058573/122134293-43df3b80-ce79-11eb-96c5-8264c84cd3a8.png" alt="XML_file" width="600"><br>
 rawで表示し、右クリックで保存
-<br><img src="https://user-images.githubusercontent.com/43058573/122134294-4477d200-ce79-11eb-8617-fa5cc6ebbee5.png" alt="download" width="600"><br>
+<br><img src="https://user-images.githubusercontent.com/43058573/122134295-4477d200-ce79-11eb-9259-6d9026bf4e1e.png" alt="save" width="600"><br>
 適切な場所に保存
-<br><img src="https://user-images.githubusercontent.com/43058573/122134295-4477d200-ce79-11eb-9259-6d9026bf4e1e.png" alt="save" width="300"><br>
+<br><img src="https://user-images.githubusercontent.com/43058573/122134294-4477d200-ce79-11eb-8617-fa5cc6ebbee5.png" alt="download" width="300"><br>
+
 
 #### BIG-IPにログインし手順に従ってBIG-IPでインポート
 適切なアカウントでログイン
