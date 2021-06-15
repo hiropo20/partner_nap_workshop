@@ -356,12 +356,10 @@ curl -s http://localhost/?a=%3Cscript%3E | head
 Discoverで攻撃の結果を確認する
 
 `outcome: REJECTED` をフィルタの条件として入力し結果を確認
-
-<img src="" alt="rejected" width="400">
+<br><img src="https://user-images.githubusercontent.com/43058573/122133506-c8c95580-ce77-11eb-8f00-c2c1931de2b7.png" alt="rejected" width="600"><br>
 
 先程確認したSupport IDを参考に`support_id:"  **SUPPORT ID**  "` (Support IDをダブルクォーテーション「"」で括る点に注意) と入力し結果を確認
-<img src="" alt="supportid" width="400">
-
+<br><img src="https://user-images.githubusercontent.com/43058573/122133507-c961ec00-ce77-11eb-9467-ba618f8fd0ec.png" alt="supportid" width="600"><br>
 
 ### 2. Policy の変更2
 #### NGINX App Protectの設定ファイルを修正
@@ -499,7 +497,6 @@ curl -s "http://localhost/?security_id=5364-0756-2298-8054?x=1&y=2" | head
 Discoverで攻撃の結果を確認する
 
 `request: "*security_id*"` をフィルタの条件として入力し結果を確認
-
 <br><img src="https://user-images.githubusercontent.com/43058573/122133503-c7982880-ce77-11eb-92fb-f5fe0a64509e.png" alt="security_id" width="600"><br>
 
 
@@ -710,19 +707,20 @@ hakazon.xmlをクリック
 rawで表示し、右クリックで保存
 <br><img src="https://user-images.githubusercontent.com/43058573/122134294-4477d200-ce79-11eb-8617-fa5cc6ebbee5.png" alt="download" width="600"><br>
 適切な場所に保存
-<br><img src="https://user-images.githubusercontent.com/43058573/122134295-4477d200-ce79-11eb-9259-6d9026bf4e1e.png" alt="save" width="600"><br>
+<br><img src="https://user-images.githubusercontent.com/43058573/122134295-4477d200-ce79-11eb-9259-6d9026bf4e1e.png" alt="save" width="300"><br>
 
 #### BIG-IPにログインし手順に従ってBIG-IPでインポート
 適切なアカウントでログイン
 <br><img src="https://user-images.githubusercontent.com/43058573/122134306-46419580-ce79-11eb-96b2-f18ddea08c5f.png" alt="login" width="600"><br>
-<br><img src="https://user-images.githubusercontent.com/43058573/122134289-42ae0e80-ce79-11eb-89e7-5acedb7133b1.png" alt="top" width="600"><br>
+`Security > Application Security > Security Policies`を開く
 <br><img src="https://user-images.githubusercontent.com/43058573/122134308-46da2c00-ce79-11eb-9242-fa52223ef394.png" alt="menu" width="600"><br>
+右上のメニューを開き`Import Policy`をクリック
 <br><img src="https://user-images.githubusercontent.com/43058573/122134297-45106880-ce79-11eb-946d-9fcd978fdd88.png" alt="policy1" width="600"><br>
+ファイルを選択し、`Import`をクリック
 <br><img src="https://user-images.githubusercontent.com/43058573/122134300-45a8ff00-ce79-11eb-9d16-e2bc1e2ac471.png" alt="policy2" width="600"><br>
+正しくインポートされ、ポリシーが生成される
 <br><img src="https://user-images.githubusercontent.com/43058573/122134305-45a8ff00-ce79-11eb-9e91-cd9f5e945417.png" alt="policy3" width="600"><br>
-<br><img src="" alt="policy3" width="600"><br>
-
-
+ポリシーの設定内容、Signatureの内容など確認
 
 
 ## Kibana操作画面
