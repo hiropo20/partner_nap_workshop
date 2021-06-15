@@ -26,13 +26,7 @@ Docker HOSTへのSSH接続は、Jump Host経由　または、SSH鍵認証を用
 ***SSH鍵を登録頂いていない場合、SSHはグレーアウトします***
 <br><a href="https://github.com/hiropo20/partner_nap_workshop_secure/blob/main/UDF_SSH_Key.pdf">UDF LAB SSH鍵登録マニュアル</a> (ラボ実施時閲覧可に変更します)<br>
 
-## Git clone
-ラボで必要なファイルをGitHubから取得
-```
-cd ~/
-git clone https://github.com/hiropo20/nap-partner-campaign_no2.git
-```
-
+## ユーザの確認
 実行ユーザの確認
 ```
 whoami
@@ -40,7 +34,13 @@ whoami
 出力結果がcentosであることを確認してください。
 webshell を利用してrootで操作している場合には、su - centos でユーザを切り替えてください
 ```
+## Git clone
 
+ラボで必要なファイルをGitHubから取得
+```
+cd ~/
+git clone https://github.com/hiropo20/nap-partner-campaign_no2.git
+```
 
 ## NGINX Plus lab
 ### 1. NGINX Plus Container Imageの作成
