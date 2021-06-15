@@ -26,13 +26,7 @@ Docker HOSTへのSSH接続は、Jump Host経由　または、SSH鍵認証を用
 ***SSH鍵を登録頂いていない場合、SSHはグレーアウトします***
 <br><a href="https://github.com/hiropo20/partner_nap_workshop_secure/blob/main/UDF_SSH_Key.pdf">UDF LAB SSH鍵登録マニュアル</a> (ラボ実施時閲覧可に変更します)<br>
 
-## Git clone
-ラボで必要なファイルをGitHubから取得
-```
-cd ~/
-git clone https://github.com/hiropo20/nap-partner-campaign_no2.git
-```
-
+## ユーザの確認
 実行ユーザの確認
 ```
 whoami
@@ -40,8 +34,238 @@ whoami
 出力結果がcentosであることを確認してください。
 webshell を利用してrootで操作している場合には、su - centos でユーザを切り替えてください
 ```
+## Git clone
+
+ラボで必要なファイルをGitHubから取得
+```
+cd ~/
+git clone https://github.com/laurentpf5/nap-partner-campaign.git
+```
+## NGINX App Protect Lab Log management
+### 1. NGINX Plus + NGINX App Protect Container Imageの作成 (前回のおさらい)
+
+#### ディレクトリの移動
+```
+cd ~/nap-partner-campaign/app-protect-container
+```
+#### NGINX Licenseファイルのコピー
+```
+cp ~/nginx-repo.crt .
+cp ~/nginx-repo.key .
+```
+#### NGINX Plus + NGINX App Protect ContainerのBuild
+```
+docker build --no-cache -t app-protect .
+```
+#### 作成したDocker Imageの確認
+```
+docker images | grep app-protect
+```
+
+### 2. NGINX Plus + NGINX App Protect 動作確認 (前回のおさらい)
+#### ラボ環境の実行
+```
+docker-compose -f docker-compose-lab-appprotect.yaml up -d
+```
+#### コンテナ動作状況の確認
+```
+docker ps 
+```
+出力結果例
+```
+$ docker ps -a
+CONTAINER ID   IMAGE                COMMAND                  CREATED         STATUS         PORTS                                                                                                                                                           NAMES
+63fd3abc1f0e   sebp/elk:793         "/usr/local/bin/star…"   3 minutes ago   Up 2 minutes   0.0.0.0:5144->5144/tcp, :::5144->5144/tcp, 0.0.0.0:5601->5601/tcp, :::5601->5601/tcp, 5044/tcp, 9300/tcp, 9600/tcp, 0.0.0.0:9200->9200/tcp, :::9200->9200/tcp   app-protect-container_elasticsearch_1
+3777958f5c2c   ianwijaya/hackazon   "supervisord -n"         3 minutes ago   Up 2 minutes   0.0.0.0:8082->80/tcp, :::8082->80/tcp                                                                                                                           app-protect-container_app2_1
+b6e1cbef4bcb   app-protect:latest   "sh /root/entrypoint…"   3 minutes ago   Up 2 minutes   0.0.0.0:80->80/tcp, :::80->80/tcp                                                                                                                               app-protect-container_approtect_1
+d94a3eff6df4   ianwijaya/hackazon   "supervisord -n"         3 minutes ago   Up 2 minutes   0.0.0.0:8081->80/tcp, :::8081->80/tcp                                                                                                                           app-protect-container_app1_1
+```
+
+#### ELKの起動確認
+※ELK起動までに少し時間がかかります。１～２分お待ち下さい
+以下の内容を参考に正常動作を確認してください
+elastic , logstash , kibanaのUIDでプロセスが動作していることを確認し、再度実行してください
+```
+docker exec -it  $(docker ps -a -f name=elastic  -q) ps -aef
+```
+出力結果例
+```
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 02:28 ?        00:00:00 /bin/bash /usr/local/bin/start.s
+root        14     1  0 02:28 ?        00:00:00 /usr/sbin/cron
+elastic+   194     1 17 02:28 ?        00:00:40 /opt/elasticsearch/jdk/bin/java
+elastic+   225   194  0 02:28 ?        00:00:00 /opt/elasticsearch/modules/x-pac
+logstash   394     1 39 02:29 ?        00:01:19 /usr/bin/java -Xms1g -Xmx1g -XX:
+kibana     405     1 24 02:29 ?        00:00:48 /opt/kibana/bin/../node/bin/node
+root       407     1  0 02:29 ?        00:00:00 tail -f /var/log/elasticsearch/e
+root       559     0  0 02:32 pts/0    00:00:00 ps -aef
+```
+ログの結果を確認
+```
+docker logs $(docker ps -a -f name=elastic  -q) | grep running
+```
+出力結果例
+```
+[2021-06-09T04:13:26,731][INFO ][logstash.agent           ] Pipelines running {:count=>1, :running_pipelines=>[:main], :non_running_pipelines=>[]}
+{"type":"log","@timestamp":"2021-06-09T04:14:34Z","tags":["info","http","server","Kibana"],"pid":390,"message":"http server running at http://0.0.0.0:5601"}
+{"type":"log","@timestamp":"2021-06-09T04:14:34Z","tags":["listening","info"],"pid":390,"message":"Server running at http://0.0.0.0:5601"}
+```
+#### ELKの設定投入
+```
+./importkibana.sh 
+```
+正しく投入された場合の出力
+```
+正しく設定が投入できた場合、JSONの結果が表示される
+$ ./importkibana.sh
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 43277  100  1419  100 41858  15306   440k --:--:-- --:--:-- --:--:--  444k
+{
+  "objects": [
+    {
+      "id": "eb626140-73a6-11ea-9cfb-3598e28db774",
+      "type": "visualization",
+      "error": {
+        "statusCode": 409,
+        "error": "Conflict",
+        "message": "Saved object [visualization/eb626140-73a6-11ea-9cfb-3598e28db774] conflict"
+      }
+    },
+※省略※
+    {
+      "id": "140fbf30-363e-11ea-983a-f74b5d6c2f97",
+      "type": "dashboard",
+      "error": {
+        "statusCode": 409,
+        "error": "Conflict",
+        "message": "Saved object [dashboard/140fbf30-363e-11ea-983a-f74b5d6c2f97] conflict"
+      }
+    }
+  ]
+}
+
+```
+ELKが起動しておらず、設定投入がエラーとなった場合以下のような出力になる場合があります
+その場合は前の項目を参考に、ELKの起動を確認してください
+```
+スクリプト実行の結果、Connectionが失敗する
+$ ./importkibana.sh
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0 41858    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+curl: (56) Recv failure: Connection reset by peer
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0 57179    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+curl: (56) Recv failure: Connection reset by peer
 
 
+一定時間結果して状況が改善しない場合、再度docker-composeを実行してください
+docker-compose -f docker-compose-lab-appprotect.yaml down
+docker-compose -f docker-compose-lab-appprotect.yaml up -d
+``` 
+
+#### NGINX App Protectが正しく動作していることを確認
+```
+docker logs $(docker ps -f name=approtect -q)
+```
+
+#### 疎通の確認
+```
+curl http://localhost/ | head
+curl http://localhost/?a=%3Cscript%3E | head
+```
+※現在ブロックする設定ではないため、WebPageの内容が出力される
+
+
+### 3. NGINX App Protectのログポリシー変更 (前回のおさらい)
+#### NGINX App Protectコンテナのログ設定ファイルを修正
+
+```
+docker exec -it $(docker ps -f name=approtect -q) bash
+grep app_protect_security_log /etc/nginx/nginx.conf
+
+vi /etc/nginx/custom_log_format.json
+
+変更内容
+"request_type": "all"
+to
+"request_type": "illegal" 
+```
+#### シェルから抜ける
+```
+exit
+```
+#### 設定の読み込み
+```
+docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
+```
+#### ログの確認
+```
+docker logs $(docker ps -f name=approtect -q)
+```
+#### いくつかの攻撃リクエストを実行し、その結果を確認する
+```
+cat << EOF > badtraffic.sh
+#!/bin/bash
+curl -s -H "1.2.3.4" http://localhost -o /dev/null
+curl -s http://localhost/%09 -o /dev/null
+curl -s http://localhost/index.bak -o /dev/null
+curl -s http://localhost?a=%3Cscript%3E -o /dev/null
+curl -s http://localhost -o /dev/null
+curl -s http://localhost/\<script\> -o /dev/null
+curl -s -H "Content-Length: -26" http://localhost/ -o /dev/null
+curl -s http://localhost/index.php -o /dev/null
+curl -s http://localhost/test.exe -o /dev/null
+curl -s http://localhost/index.html -o /dev/null
+curl -s http://localhost/basic/index.php -o /dev/null
+EOF
+
+./badtraffic.sh
+```
+#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
+
+
+
+
+
+### =================================================================================
+
+### 4. NGINX App Protectのセキュリティポリシー変更
+NGINX App Protectコンテナのポリシー設定ファイルを修正
+
+```
+docker exec -it $(docker ps -f name=approtect -q) bash
+grep policy_file /etc/nginx/nginx.conf
+vi /etc/nginx/labpolicy.json
+
+変更内容
+  "enforcementMode": "transparent"
+to
+  "enforcementMode": "blocking"
+```
+#### シェルから抜ける
+```
+exit
+```
+#### 設定の読み込み
+```
+docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
+```
+#### ログの確認
+```
+docker logs $(docker ps -f name=approtect -q)
+```
+
+#### いくつかの攻撃リクエストを実行し、その結果を確認する
+```
+./badtraffic.sh
+```
+#### Kibanaを開き、結果を確認（操作メニューは[こちら](https://github.com/hiropo20/partner_nap_workshop/blob/main/no3/README.md#kibana%E6%93%8D%E4%BD%9C%E7%94%BB%E9%9D%A2)を参照）
+
+
+## ---------------------------------------------------------------------------------------
 ## NGINX Plus lab
 ### 1. NGINX Plus Container Imageの作成
 #### ディレクトリの移動
