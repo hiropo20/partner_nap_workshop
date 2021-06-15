@@ -258,7 +258,9 @@ vi /etc/nginx/nginx.conf
  app_protect_security_log "/etc/nginx/custom_log_format.json" syslog:server=elasticsearch:5144;
 to
  app_protect_security_log "/etc/nginx/custom_log_format.json" stderr;
-
+![parm_security_id](https://user-images.githubusercontent.com/43058573/122133503-c7982880-ce77-11eb-92fb-f5fe0a64509e.png)
+![rejected](https://user-images.githubusercontent.com/43058573/122133506-c8c95580-ce77-11eb-8f00-c2c1931de2b7.png)
+![support_id](https://user-images.githubusercontent.com/43058573/122133507-c961ec00-ce77-11eb-9467-ba618f8fd0ec.png)
 
 ```
 #### シェルから抜ける
