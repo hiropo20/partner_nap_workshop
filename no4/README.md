@@ -553,7 +553,26 @@ $ docker ps | grep approtect-nap-signature
 d37d57824c51   app-protect-signature:latest   "sh /entrypoint.sh"      9 seconds ago       Up 7 seconds       0.0.0.0:8001->80/tcp, :::8001->80/tcp    app-protect-container_approtect-nap-signature_1
 
 ```
+### 違いの比較
+```
+利用していたAppProtectコンテナ
+$  docker exec -it app-protect-container_approtect_1 bash
+[root@20739ad1411a /]# yum list | grep app-protect
+app-protect.x86_64                        24+3.512.0-1.el7.ngx           @nginx-plus
+app-protect-compiler.x86_64               6.64.2-1.el7.ngx               @nginx-plus
+app-protect-engine.x86_64                 6.64.2-1.el7.ngx.el7.centos    @nginx-plus
+app-protect-plugin.x86_64                 3.512.0-1.el7.ngx              @nginx-plus
 
+
+Signature Update済みコンテナ
+# yum list | grep app-protect
+app-protect.x86_64                        24+3.512.0-1.el7.ngx           @nginx-plus
+app-protect-attack-signatures.x86_64      2021.06.11-1.el7.ngx           @app-protect-security-updates
+app-protect-compiler.x86_64               6.64.2-1.el7.ngx               @nginx-plus
+app-protect-engine.x86_64                 6.64.2-1.el7.ngx.el7.centos    @nginx-plus
+app-protect-plugin.x86_64                 3.512.0-1.el7.ngx              @nginx-plus
+app-protect-threat-campaigns.x86_64       2021.06.14-1.el7.ngx           @app-protect-security-updates
+```
 
 ```
 利用していたAppProtectはコンテナ作成時のSignature Updateを実施していない
