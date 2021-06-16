@@ -22,7 +22,7 @@ RDPのUser名、パスワードはDETAILSをクリックし、Generalのタブ�
 ### Linux Hostへの接続
 Docker Hostへの接続は以下メニューを開き利用ください
 <br><img src="https://user-images.githubusercontent.com/43058573/121283528-404a3280-c916-11eb-8a60-bfde13129dfc.png" alt="Docker Menu" width="200"><br>
-Docker HOSTへのSSH接続は、Jump Host経由　または、SSH鍵認証を用いて接続可能です。SSH鍵の登録手順は以下を参照ください
+Docker HOSTへのSSH接続は、Jump Host経由　または、SSH鍵認証を用いて接続可能です。SSH鍵の登録手順は以下を参照ください   
 ***SSH鍵を登録頂いていない場合、SSHはグレーアウトします***
 <br><a href="https://github.com/hiropo20/partner_nap_workshop_secure/blob/main/UDF_SSH_Key.pdf">UDF LAB SSH鍵登録マニュアル</a> (ラボ実施時閲覧可に変更します)<br>
 
@@ -781,7 +781,7 @@ docker logs $(docker ps -f name=approtect-nap-convertedpolicy -q)  2>&1 | grep p
 <br><img src="https://user-images.githubusercontent.com/43058573/122148033-e658e800-ce94-11eb-9cd4-3d961677fc40.png" alt="gui" width="200"><br>
 
 #### 以下GitHubのSecurity Policy(XML)をローカルにダウンロード
-[GitHub Partner Nap Campaign](https://github.com/laurentpf5/nap-partner-campaign.git)内のhakazon.xmlをクリック
+[GitHub Partner Nap Campaign](https://github.com/laurentpf5/nap-partner-campaign.git)内のhackazon.xmlをクリック
 <br><img src="https://user-images.githubusercontent.com/43058573/122134293-43df3b80-ce79-11eb-96c5-8264c84cd3a8.png" alt="XML_file" width="600"><br>
 rawで表示し、右クリックで保存
 <br><img src="https://user-images.githubusercontent.com/43058573/122134295-4477d200-ce79-11eb-9259-6d9026bf4e1e.png" alt="save" width="600"><br>
