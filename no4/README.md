@@ -511,12 +511,11 @@ Discoverで攻撃の結果を確認する
 ## コンテナのSignature更新
 ### Sinagureがアップデートされたコンテナの作成
 
-
+コンテナをBuild
 ```
 docker build -f Dockerfile-attack-signatures -t app-protect-signature .
 ```
-
-コンテナが生成できたことを確認
+作成したDocker Imageの確認
 ```
 docker images | grep app-protect
 
@@ -655,11 +654,11 @@ less Dockerfile-attack-signatures
 
 ## BIG-IP AWAF Security Policyのコンバート
 ### NGINX App ProtectのPolicyにコンバート
-ポリシーコンバートを行うコンテナの作成
+ポリシーコンバートを行うコンテナのBuild
 ```
 docker build -f Dockerfile-Converter -t policy-converter .
 ```
-ポリシーコンバートのコンテナが作成されていることを確認
+作成したDocker Imageの確認
 ```
 docker images | grep policy-converter
 
@@ -684,11 +683,11 @@ services:
 EOF
 ```
 
-BIG-IPポリシーファイルの配置場所の作成
+BIG-IP AWAF Security Policyの配置場所の作成
 ```
 mkdir  /var/tmp/convert
 ```
-AWAF Security PolicyのXMLを配置
+BIG-IP AWAF Security PolicyのXMLを配置
 ```
 cp policy.xml /var/tmp/convert
 ls /var/tmp/convert
@@ -758,7 +757,7 @@ docker-compose -f docker-compose-nap-convertedpolicy.yaml up -d
 
 WARNING: Found orphan containersのログが出力されますが問題ありません
 ```
-コンバート済みポリシーをインポートしたNAPが起動しているか確認
+コンバート済みポリシーをインポートしたNGINX App Protectが起動しているか確認
 ```
 docker ps | grep approtect-nap-convertedpolicy
 
