@@ -639,7 +639,7 @@ AppProtectコンテナの出力結果
 2021/06/15 12:48:46 [notice] 13#13: APP_PROTECT { "event": "configuration_load_success", "software_version": "3.512.0", "user_signatures_packages":[],"attack_signatures_package":{"revision_datetime":"2019-07-16T12:21:31Z"},"completed_successfully":true,"threat_campaigns_package":{}}
 
 
-docker logs $(docker ps -a -f name=approtect-nap-signature -q) 2>&1 | grep attack_signatures_package
+docker logs $(docker ps -f name=approtect-nap-signature -q) 2>&1 | grep attack_signatures_package
 
 Signature Updateを行ったコンテナ出力結果
 App Protectコンテナと比較し、Signatureの日付や、threat_campaigns_package signatureの情報有無が差分であることを確認
