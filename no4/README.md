@@ -26,6 +26,13 @@ Docker HOSTへのSSH接続は、Jump Host経由　または、SSH鍵認証を用
 ***SSH鍵を登録頂いていない場合、SSHはグレーアウトします***
 <br><a href="https://github.com/hiropo20/partner_nap_workshop_secure/blob/main/UDF_SSH_Key.pdf">UDF LAB SSH鍵登録マニュアル</a> (ラボ実施時閲覧可に変更します)<br>
 
+## LAB環境
+<br><img src="https://user-images.githubusercontent.com/43058573/122137731-498c4f80-ce80-11eb-84d6-a6e6f97e1a20.png" alt="lab" width="800"><br>
+- 作業の多くは、Docker Host上で実施します
+- Windows Jumpo Host経由でログインするか、SSH Clientかどちらかの方法で接続ください
+- BIG-IPはGUIでの操作のみ行います。
+- BIG-IPはXMLファイルの中身をGUIで確認する用途のみで利用しますので、お時間に余裕があればご対応ください
+ 
 ## ユーザの確認
 実行ユーザの確認
 ```
@@ -361,7 +368,7 @@ Discoverで攻撃の結果を確認する
 先程確認したSupport IDを参考に`support_id:"  **SUPPORT ID**  "` (Support IDをダブルクォーテーション「"」で括る点に注意) と入力し結果を確認
 <br><img src="https://user-images.githubusercontent.com/43058573/122133507-c961ec00-ce77-11eb-9467-ba618f8fd0ec.png" alt="supportid" width="600"><br>
 
-### 2. Policy の変更2
+### 2. Policy の変更2 (FileType)
 #### NGINX App Protectの設定ファイルを修正
 
 ```
@@ -433,7 +440,7 @@ Discoverで攻撃の結果を確認する
 <br><img src="https://user-images.githubusercontent.com/43058573/122133507-c961ec00-ce77-11eb-9467-ba618f8fd0ec.png" alt="supportid" width="600"><br>
 
 
-### 3. Policy の変更3
+### 3. Policy の変更3 (Data Guard)
 #### NGINX App Protectの設定ファイルを修正
 
 ```
@@ -498,12 +505,12 @@ Discoverで攻撃の結果を確認する
 
 `request: "*security_id*"` をフィルタの条件として入力し結果を確認
 <br><img src="https://user-images.githubusercontent.com/43058573/122133503-c7982880-ce77-11eb-92fb-f5fe0a64509e.png" alt="security_id" width="600"><br>
-
-
+指定した条件でデータがマスキングされていることを確認
 
 
 ## コンテナ内のSignature Database 
 ### Sinagureがアップデートされたコンテナの作成
+
 
 ```
 docker build -f Dockerfile-attack-signatures -t app-protect-signature .
@@ -518,11 +525,55 @@ app-protect-signature が追加されていることを確認
 app-protect-signature   latest     411b37584ef5   3 minutes ago   636MB
 app-protect             latest     2ab5a8cac274   3 hours ago     622MB
 ```
-
-コンテナを起動するための内容を確認
-
+nginx.confを作成
 ```
-$ cat docker-compose-nap-signature.yaml
+cat << EOF > nginx-sig.conf
+
+user nginx;
+
+worker_processes auto;
+load_module modules/ngx_http_app_protect_module.so;
+
+error_log /var/log/nginx/error.log debug;
+
+events {
+    worker_connections 10240;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    sendfile on;
+    keepalive_timeout 65;
+
+    resolver 127.0.0.11;
+
+    upstream app_backend_com {
+        zone app_backend_group 64k;
+        server 127.0.0.1:80;
+    }
+    server {
+        listen 80;
+        #server_name app.example.com;
+        proxy_http_version 1.1;
+
+        app_protect_enable on;
+        app_protect_security_log_enable on;
+        app_protect_security_log "/etc/nginx/custom_log_format.json" syslog:server=elasticsearch:5144;
+        app_protect_policy_file "/etc/nginx/labpolicy.json";
+
+        location / {
+            client_max_body_size 0;
+            default_type text/html;
+            proxy_pass http://app_backend_com;
+        }
+    }
+}
+EOF
+```
+Docker Composeファイルを作成
+```
+cat << EOF > docker-compose-nap-signature.yaml
 version: '3'
 services:
     approtect-nap-signature:
@@ -530,20 +581,20 @@ services:
         volumes:
             - ./custom_log_format.json:/etc/nginx/custom_log_format.json
             - ./labpolicy.json:/etc/nginx/labpolicy.json
-            - ./nginx.conf-sig:/etc/nginx/nginx.conf
+            - ./nginx-sig.conf:/etc/nginx/nginx.conf
             - ./nginx-repo.crt:/etc/ssl/nginx/nginx-repo.crt
             - ./nginx-repo.key:/etc/ssl/nginx/nginx-repo.key
         ports:
             - "8001:80"
 
+EOF
 ```
-実行
 
+Docker Composeの実行
 ```
-$ docker-compose -f docker-compose-nap-signature.yaml up -d
-WARNING: Found orphan containers (app-protect-container_approtect_1, app-protect-container_app1_1, app-protect-container_elasticsearch_1, app-protect-container_app2_1, app-protect-container_approtect-nap-convertedpolicy_1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.
-Creating app-protect-container_approtect-nap-signature_1 ... done
+docker-compose -f docker-compose-nap-signature.yaml up -d
 
+WARNING: Found orphan containersのログが出力されますが問題ありません
 ```
 以下の通り、正しく起動していることを確認
 ```
@@ -551,11 +602,14 @@ $ docker ps | grep approtect-nap-signature
 d37d57824c51   app-protect-signature:latest   "sh /entrypoint.sh"      9 seconds ago       Up 7 seconds       0.0.0.0:8001->80/tcp, :::8001->80/tcp    app-protect-container_approtect-nap-signature_1
 
 ```
-### 違いの比較
+### Signature情報の比較
+インストールしているパッケージの確認
 ```
 利用していたAppProtectコンテナ
-$  docker exec -it app-protect-container_approtect_1 bash
-[root@20739ad1411a /]# yum list | grep app-protect
+docker exec -it app-protect-container_approtect_1 bash
+yum list | grep app-protect
+
+以下の様な結果が出力されることを確認
 app-protect.x86_64                        24+3.512.0-1.el7.ngx           @nginx-plus
 app-protect-compiler.x86_64               6.64.2-1.el7.ngx               @nginx-plus
 app-protect-engine.x86_64                 6.64.2-1.el7.ngx.el7.centos    @nginx-plus
@@ -563,27 +617,40 @@ app-protect-plugin.x86_64                 3.512.0-1.el7.ngx              @nginx-
 
 
 Signature Update済みコンテナ
-[centos@ip-10-1-1-5 ~]$  docker exec -it app-protect-container_approtect_1 bash
-# yum list | grep app-protect
+docker exec -it app-protect-container_approtect-nap-signature_1 bash
+yum list | grep app-protect
+
+以下の様な結果が出力されることを確認
 app-protect.x86_64                        24+3.512.0-1.el7.ngx           @nginx-plus
 app-protect-attack-signatures.x86_64      2021.06.11-1.el7.ngx           @app-protect-security-updates
 app-protect-compiler.x86_64               6.64.2-1.el7.ngx               @nginx-plus
 app-protect-engine.x86_64                 6.64.2-1.el7.ngx.el7.centos    @nginx-plus
 app-protect-plugin.x86_64                 3.512.0-1.el7.ngx              @nginx-plus
 app-protect-threat-campaigns.x86_64       2021.06.14-1.el7.ngx           @app-protect-security-updates
-```
 
 ```
-利用していたAppProtectはコンテナ作成時のSignature Updateを実施していない
-$ docker logs app-protect-container_approtect_1 2>&1 | grep attack_signatures_package
+ログの確認
+```
+docker logs app-protect-container_approtect_1 2>&1 | grep attack_signatures_package
+
+AppProtectコンテナの出力結果
 2021/06/15 12:48:46 [notice] 13#13: APP_PROTECT { "event": "configuration_load_success", "software_version": "3.512.0", "user_signatures_packages":[],"attack_signatures_package":{"revision_datetime":"2019-07-16T12:21:31Z"},"completed_successfully":true,"threat_campaigns_package":{}}
-2021/06/15 12:49:16 [notice] 13#13: APP_PROTECT { "event": "configuration_load_success", "software_version": "3.512.0", "user_signatures_packages":[],"attack_signatures_package":{"revision_datetime":"2019-07-16T12:21:31Z"},"completed_successfully":true,"threat_campaigns_package":{}}
 
-今回作成したコンテナはSignature Updateを行っている
-$ docker logs app-protect-container_approtect-nap-signature_1  2>&1 | grep attack_signatures_package
+
+
+docker logs app-protect-container_approtect-nap-signature_1  2>&1 | grep attack_signatures_package
+
+Signature Updateを行ったコンテナ出力結果
+App Protectコンテナと比較し、Signatureの日付や、threat_campaigns_package signatureの情報有無が差分であることを確認
+
 2021/06/15 14:54:10 [notice] 14#14: APP_PROTECT { "event": "configuration_load_success", "software_version": "3.512.0", "user_signatures_packages":[],"attack_signatures_package":{"revision_datetime":"2021-06-11T14:07:02Z","version":"2021.06.11"},"completed_successfully":true,"threat_campaigns_package":{"revision_datetime":"2021-06-14T13:14:59Z","version":"2021.06.14"}}
 ```
-DockerFileのポイントも比較
+
+以下ファイルの内容を確認し、それぞれのDocker Image作成時に実行するコマンドの違いを確認し、コンテナ作成時の手順を確認
+```
+less Dockerfile
+less Dockerfile-attack-signatures
+```
 
 ## BIG-IP AWAF Security Policyのコンバート
 ### NGINX App ProtectのPolicyにコンバート
@@ -591,14 +658,16 @@ DockerFileのポイントも比較
 ```
 docker build -f Dockerfile-Converter -t policy-converter .
 ```
-正しくできている
+ポリシーコンバートのコンテナが作成されていることを確認
 ```
-$ docker images | grep policy-converter
+docker images | grep policy-converter
+
+ポリシーコンバートのコンテナが作成されていることを確認
 policy-converter        latest     50dc92c3742f   40 seconds ago      526MB
 ```
-以下の通りファイルを作成
+Docker Composeファイルを作成
 ```
-$ cat docker-compose-nap-convertedpolicy.yaml
+cat << EOF > docker-compose-nap-convertedpolicy.yaml
 version: '3'
 services:
     approtect-nap-convertedpolicy:
@@ -611,23 +680,23 @@ services:
             - ./nginx-repo.key:/etc/ssl/nginx/nginx-repo.key
         ports:
             - "8002:80"
+EOF
 ```
 
-BIG-IPポリシーファイルの配置場所
+BIG-IPポリシーファイルの配置場所の作成
 ```
 mkdir  /var/tmp/convert
 ```
-XMLを配置
+AWAF Security PolicyのXMLを配置
 ```
-$ cp policy.xml /var/tmp/convert
-$ ls /var/tmp/convert
-policy.xml
+cp policy.xml /var/tmp/convert
+ls /var/tmp/convert
 ```
-コンバートの実行
+ポリシーのコンバートの実行
 ```
 docker run -v /var/tmp/convert:/var/tmp/convert policy-converter:latest /opt/app_protect/bin/convert-policy -i /var/tmp/convert/policy.xml -o /var/tmp/convert/policy.json | jq
 
-以下の様にNAPのSecurity Policyコンバート際の警告、出力結果の情報を確認してください
+以下の様にNAPのSecurity Policyコンバート際に出力される警告の内容、出力結果の情報を確認してください
 {
   "warnings": [
     "Default header '*-bin' cannot be deleted.",
@@ -682,20 +751,23 @@ $ grep Demo_NGINX_Policy /var/tmp/convert/policy.json
 cp /var/tmp/convert/policy.json convertedpolicy.json
 ```
 
-コンバート済みポリシーをNAPで参照し、起動
+コンバート済みポリシーをNGINX App Protectで参照しコンテナを起動
 ```
-$ docker-compose -f docker-compose-nap-convertedpolicy.yaml up -d
-WARNING: Found orphan containers (app-protect-container_app2_1, app-protect-container_elasticsearch_1, app-protect-container_app1_1, app-protect-container_approtect_1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.
-Recreating app-protect-container_approtect-nap-convertedpolicy_1 ... done
+docker-compose -f docker-compose-nap-convertedpolicy.yaml up -d
+
+WARNING: Found orphan containersのログが出力されますが問題ありません
 ```
 コンバート済みポリシーをインポートしたNAPが起動しているか確認
 ```
-$ docker ps | grep approtect-nap-convertedpolicy
+docker ps | grep approtect-nap-convertedpolicy
+
 84b8084c2e62   app-protect:latest             "sh /root/entrypoint…"  8 minutes ago       Up 8 minutes       0.0.0.0:8002->80/tcp, :::8002->80/tcp    app-protect-container_approtect-nap-convertedpolicy_1    
 ```
 正しくポリシーが読み込まれていることがわかる
 ```
-$ docker logs app-protect-container_approtect-nap-convertedpolicy_1  2>&1 | grep policy
+docker logs app-protect-container_approtect-nap-convertedpolicy_1  2>&1 | grep policy
+
+正しくポリシーが読み込まれていることがわかる
 2021/06/15 14:45:22 [notice] 13#13: APP_PROTECT policy '/Common/Demo_NGINX_Policy' from: /etc/nginx/labpolicy.json compiled successfully
 ```
 
