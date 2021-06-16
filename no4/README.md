@@ -508,7 +508,7 @@ Discoverで攻撃の結果を確認する
 指定した条件でデータがマスキングされていることを確認
 
 
-## コンテナ内のSignature Database 
+## コンテナ内のSignature更新
 ### Sinagureがアップデートされたコンテナの作成
 
 
