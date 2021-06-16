@@ -402,7 +402,7 @@ vi /etc/nginx/labpolicy.json
             }
         ]
     }
-
+}
 
 ```
 
