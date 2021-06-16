@@ -766,7 +766,7 @@ docker ps | grep approtect-nap-convertedpolicy
 ```
 コンテナのログを確認
 ```
-docker logs $(docker ps -a -f name=approtect-nap-convertedpolicy -q)  2>&1 | grep policy
+docker logs $(docker ps -f name=approtect-nap-convertedpolicy -q)  2>&1 | grep policy
 
 正しくポリシーが読み込まれていることを確認
 2021/06/15 14:45:22 [notice] 13#13: APP_PROTECT policy '/Common/Demo_NGINX_Policy' from: /etc/nginx/labpolicy.json compiled successfully
