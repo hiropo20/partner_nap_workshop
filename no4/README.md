@@ -34,7 +34,7 @@ Docker HOSTへのSSH接続は、Jump Host経由　または、SSH鍵認証を用
 - BIG-IPはXMLファイルの中身をGUIで確認する用途のみで利用しますので、お時間に余裕があればご対応ください
  
 ## ユーザの確認
-実行ユーザの確認
+Docker Hostにログインし、実行ユーザの確認
 ```
 whoami
 
