@@ -175,7 +175,7 @@ docker-compose -f docker-compose-lab-appprotect.yaml up -d
 
 #### NGINX App Protectが正しく動作していることを確認
 ```
-docker logs $(docker ps -f name=approtect -q)
+docker logs $(docker ps -f name=approtect_ -q)
 ```
 
 #### 疎通の確認
@@ -190,7 +190,7 @@ curl -s http://localhost/?a=%3Cscript%3E | head
 #### NGINX App Protectコンテナのログ設定ファイルを修正
 
 ```
-docker exec -it $(docker ps -f name=approtect -q) bash
+docker exec -it $(docker ps -f name=approtect_ -q) bash
 grep app_protect_security_log /etc/nginx/nginx.conf
 
 vi /etc/nginx/custom_log_format.json
@@ -206,11 +206,11 @@ exit
 ```
 #### 設定の読み込み
 ```
-docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
+docker exec -it $(docker ps -f name=approtect_ -q) nginx -s reload
 ```
 #### ログの確認
 ```
-docker logs $(docker ps -f name=approtect -q)
+docker logs $(docker ps -f name=approtect_ -q)
 ```
 #### いくつかの攻撃リクエストを実行し、その結果を確認する
 ```
@@ -241,7 +241,7 @@ EOF
 #### NGINX App Protectコンテナのログ設定ファイルを修正
 
 ```
-docker exec -it $(docker ps -f name=approtect -q) bash
+docker exec -it $(docker ps -f name=approtect_ -q) bash
 cp /etc/nginx/custom_log_format.json /etc/nginx/custom_log_format.json-bk
 vi /etc/nginx/custom_log_format.json
 
@@ -272,7 +272,7 @@ exit
 ```
 #### 設定の読み込み
 ```
-docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
+docker exec -it $(docker ps -f name=approtect_ -q) nginx -s reload
 ```
 
 #### 疎通の確認
@@ -284,7 +284,7 @@ curl -s http://localhost/?a=%3Cscript%3E | head
 
 #### ログの確認
 ```
-docker logs $(docker ps -f name=approtect -q)
+docker logs $(docker ps -f name=approtect_ -q)
 ```
 定義したフォーマットでログがstderrに出力され、docker logsで表示できることを確認
 
@@ -295,7 +295,7 @@ docker logs $(docker ps -f name=approtect -q)
 #### NGINX App Protectの設定ファイルを修正
 
 ```
-docker exec -it $(docker ps -f name=approtect -q) bash
+docker exec -it $(docker ps -f name=approtect_ -q) bash
 grep policy_file /etc/nginx/nginx.conf
 vi /etc/nginx/labpolicy.json
 
@@ -338,11 +338,11 @@ exit
 ```
 #### 設定の読み込み
 ```
-docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
+docker exec -it $(docker ps -f name=approtect_ -q) nginx -s reload
 ```
 #### ログの確認
 ```
-docker logs $(docker ps -f name=approtect -q)
+docker logs $(docker ps -f name=approtect_ -q)
 ```
 
 #### 攻撃リクエストを実行し、その結果を確認する
@@ -372,7 +372,7 @@ Discoverで攻撃の結果を確認する
 #### NGINX App Protectの設定ファイルを修正
 
 ```
-docker exec -it $(docker ps -f name=approtect -q) bash
+docker exec -it $(docker ps -f name=approtect_ -q) bash
 grep policy_file /etc/nginx/nginx.conf
 vi /etc/nginx/labpolicy.json
 
@@ -413,11 +413,11 @@ exit
 ```
 #### 設定の読み込み
 ```
-docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
+docker exec -it $(docker ps -f name=approtect_ -q) nginx -s reload
 ```
 #### ログの確認
 ```
-docker logs $(docker ps -f name=approtect -q)
+docker logs $(docker ps -f name=approtect_ -q)
 ```
 
 #### 攻撃リクエストを実行し、その結果を確認する
@@ -444,7 +444,7 @@ Discoverで攻撃の結果を確認する
 #### NGINX App Protectの設定ファイルを修正
 
 ```
-docker exec -it $(docker ps -f name=approtect -q) bash
+docker exec -it $(docker ps -f name=approtect_ -q) bash
 grep policy_file /etc/nginx/nginx.conf
 vi /etc/nginx/labpolicy.json
 
@@ -486,11 +486,11 @@ exit
 ```
 #### 設定の読み込み
 ```
-docker exec -it $(docker ps -f name=approtect -q) nginx -s reload
+docker exec -it $(docker ps -f name=approtect_ -q) nginx -s reload
 ```
 #### ログの確認
 ```
-docker logs $(docker ps -f name=approtect -q)
+docker logs $(docker ps -f name=approtect_ -q)
 ```
 
 #### 攻撃リクエストを実行し、その結果を確認する
@@ -598,14 +598,15 @@ WARNING: Found orphan containersのログが出力されますが問題ありま
 ```
 以下の通り、正しく起動していることを確認
 ```
-$ docker ps | grep approtect-nap-signature
+docker ps | grep approtect-nap-signature
+
 d37d57824c51   app-protect-signature:latest   "sh /entrypoint.sh"      9 seconds ago       Up 7 seconds       0.0.0.0:8001->80/tcp, :::8001->80/tcp    app-protect-container_approtect-nap-signature_1
 
 ```
 ### Signature情報の比較
 インストールしているパッケージの確認
 ```
-利用していたAppProtectコンテナ
+利用していたAppProtectコンテナにログインし、パッケージを確認
 docker exec -it app-protect-container_approtect_1 bash
 yum list | grep app-protect
 
@@ -616,7 +617,7 @@ app-protect-engine.x86_64                 6.64.2-1.el7.ngx.el7.centos    @nginx-
 app-protect-plugin.x86_64                 3.512.0-1.el7.ngx              @nginx-plus
 
 
-Signature Update済みコンテナ
+Signature Update済みコンテナにログインし、パッケージを確認
 docker exec -it app-protect-container_approtect-nap-signature_1 bash
 yum list | grep app-protect
 
@@ -631,14 +632,14 @@ app-protect-threat-campaigns.x86_64       2021.06.14-1.el7.ngx           @app-pr
 ```
 ログの確認
 ```
-docker logs app-protect-container_approtect_1 2>&1 | grep attack_signatures_package
+
+docker logs  $(docker ps -f name=approtect_ -q) 2>&1 | grep attack_signatures_package
 
 AppProtectコンテナの出力結果
 2021/06/15 12:48:46 [notice] 13#13: APP_PROTECT { "event": "configuration_load_success", "software_version": "3.512.0", "user_signatures_packages":[],"attack_signatures_package":{"revision_datetime":"2019-07-16T12:21:31Z"},"completed_successfully":true,"threat_campaigns_package":{}}
 
 
-
-docker logs app-protect-container_approtect-nap-signature_1  2>&1 | grep attack_signatures_package
+docker logs $(docker ps -a -f name=approtect-nap-signature -q) 2>&1 | grep attack_signatures_package
 
 Signature Updateを行ったコンテナ出力結果
 App Protectコンテナと比較し、Signatureの日付や、threat_campaigns_package signatureの情報有無が差分であることを確認
@@ -763,11 +764,11 @@ docker ps | grep approtect-nap-convertedpolicy
 
 84b8084c2e62   app-protect:latest             "sh /root/entrypoint…"  8 minutes ago       Up 8 minutes       0.0.0.0:8002->80/tcp, :::8002->80/tcp    app-protect-container_approtect-nap-convertedpolicy_1    
 ```
-正しくポリシーが読み込まれていることがわかる
+コンテナのログを確認
 ```
-docker logs app-protect-container_approtect-nap-convertedpolicy_1  2>&1 | grep policy
+docker logs $(docker ps -a -f name=approtect-nap-convertedpolicy -q)  2>&1 | grep policy
 
-正しくポリシーが読み込まれていることがわかる
+正しくポリシーが読み込まれていることを確認
 2021/06/15 14:45:22 [notice] 13#13: APP_PROTECT policy '/Common/Demo_NGINX_Policy' from: /etc/nginx/labpolicy.json compiled successfully
 ```
 
