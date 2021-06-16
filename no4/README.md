@@ -776,6 +776,9 @@ docker logs $(docker ps -f name=approtect-nap-convertedpolicy -q)  2>&1 | grep p
 
 ### BIG-IP AWAF上でPolicyの確認 (お客様環境のBIG-IPでお試しください)
 
+#### UDFをご利用の場合、GUIより管理画面を開いてください
+<br><img src="https://user-images.githubusercontent.com/43058573/122148033-e658e800-ce94-11eb-9cd4-3d961677fc40.png" alt="gui" width="200"><br>
+
 #### 以下GitHubのSecurity Policy(XML)をローカルにダウンロード
 [GitHub Partner Nap Campaign](https://github.com/laurentpf5/nap-partner-campaign.git)内のhakazon.xmlをクリック
 <br><img src="https://user-images.githubusercontent.com/43058573/122134293-43df3b80-ce79-11eb-96c5-8264c84cd3a8.png" alt="XML_file" width="600"><br>
