@@ -512,7 +512,7 @@ Discoverで攻撃の結果を確認する
 
 
 ## コンテナのSignature更新
-### Sinagureがアップデートされたコンテナの作成
+### 1. SignatureがアップデートされたContainer Imageの作成
 
 コンテナをBuild
 ```
@@ -605,7 +605,7 @@ docker ps | grep approtect-nap-signature
 d37d57824c51   app-protect-signature:latest   "sh /entrypoint.sh"      9 seconds ago       Up 7 seconds       0.0.0.0:8001->80/tcp, :::8001->80/tcp    app-protect-container_approtect-nap-signature_1
 
 ```
-### Signature情報の比較
+### 2. Signature情報の比較
 インストールしているパッケージの確認
 ```
 利用していたAppProtectコンテナにログインし、パッケージを確認
@@ -656,7 +656,7 @@ less Dockerfile-attack-signatures
 ```
 
 ## BIG-IP AWAF Security Policyのコンバート
-### NGINX App ProtectのPolicyにコンバート
+### 1. Policyコンバート用のContainer Imageの作成
 ポリシーコンバートを行うコンテナのBuild
 ```
 docker build -f Dockerfile-Converter -t policy-converter .
@@ -668,6 +668,7 @@ docker images | grep policy-converter
 ポリシーコンバートのコンテナが作成されていることを確認
 policy-converter        latest     50dc92c3742f   40 seconds ago      526MB
 ```
+### 2. NGINX App ProtectのPolicyにコンバート
 Docker Composeファイルを作成
 ```
 cat << EOF > docker-compose-nap-convertedpolicy.yaml
