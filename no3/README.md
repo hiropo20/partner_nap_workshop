@@ -39,7 +39,7 @@ webshell を利用してrootで操作している場合には、su - centos で�
 ラボで必要なファイルをGitHubから取得
 ```
 cd ~/
-git clone https://github.com/hiropo20/nap-partner-campaign_no2.git
+git clone https://github.com/hiropo20/nap-partner-campaign_no3.git
 ```
 
 ## NGINX Plus lab
