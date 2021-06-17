@@ -46,7 +46,7 @@ webshell を利用してrootで操作している場合には、su - centos で�
 ラボで必要なファイルをGitHubから取得
 ```
 cd ~/
-git clone https://github.com/laurentpf5/nap-partner-campaign.git
+git clone https://github.com/hiropo20/nap-partner-campaign_no4.git
 ```
 ## NGINX App Protect Lab Log management
 ### 1. NGINX Plus + NGINX App Protect Container Imageの作成 (前回のおさらい)
