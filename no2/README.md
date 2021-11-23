@@ -1,8 +1,43 @@
+
+
+
 # Lab手順
 
 ## 実施環境
 * 事前にラボ環境へのInviteを行っておりますので、メールをご確認ください
-* 利用するコマンド： git , docker, sudo, curl
+* 利用するコマンド： git , docker, docker-compose , jq , sudo, curl
+* NGINX Trialライセンスの取得、ラボ実施ユーザのHome Directryへ配置
+
+## UDF コンポーネントへの接続
+### Windows Jump HostへのRDP接続
+Windows Jump HostからCLIの操作を行う場合、以下タブからRDP Clientファイルをダウンロードいただき接続ください
+<br><img src="https://user-images.githubusercontent.com/43058573/121283531-417b5f80-c916-11eb-9ff9-8d0e7e8f1aad.png" alt="RDP" width="200"><br>
+
+Windows Jump Hostへログインいただくと、SSHを実行するバッチファイルがありますので、そちらをダブルクリックしDocker_HOSTへ接続ください
+<br><img src="https://user-images.githubusercontent.com/43058573/121170154-c8392980-c88f-11eb-9879-f7bb9c4f13a3.png" alt="ssh"><br>
+RDPのUser名、パスワードはDETAILSをクリックし、GeneralのタブのCredentialsの項目を参照ください
+<br><img src="https://user-images.githubusercontent.com/43058573/121283534-417b5f80-c916-11eb-88af-9f95c2ced284.png" alt="DETAILS" width="200"><br>
+<img src="https://user-images.githubusercontent.com/43058573/121283535-4213f600-c916-11eb-8a89-67362d7a340b.png" alt="Generals" width="300"><br>
+
+### Linux Hostへの接続
+Docker Hostへの接続は以下メニューを開き利用ください
+<br><img src="https://user-images.githubusercontent.com/43058573/121283528-404a3280-c916-11eb-8a60-bfde13129dfc.png" alt="Docker Menu" width="200"><br>
+Docker HOSTへのSSH接続は、Jump Host経由　または、SSH鍵認証を用いて接続可能です。SSH鍵の登録手順は以下を参照ください   
+***SSH鍵を登録頂いていない場合、SSHはグレーアウトします***
+<br><a href="https://github.com/hiropo20/partner_nap_workshop_secure/blob/main/UDF_SSH_Key.pdf">UDF LAB SSH鍵登録マニュアル</a> (ラボ実施時閲覧可に変更します)<br>
+
+## LAB環境
+<br><img src="https://user-images.githubusercontent.com/43058573/122137731-498c4f80-ce80-11eb-84d6-a6e6f97e1a20.png" alt="lab" width="800"><br>
+- Windows Jumpo Host経由でログインするか、SSH Clientかどちらかの方法で接続ください
+ 
+## ユーザの確認
+Docker Hostにログインし、実行ユーザの確認
+```
+whoami
+
+出力結果がcentosであることを確認してください。
+webshell を利用してrootで操作している場合には、su - centos でユーザを切り替えてください
+```
 
 ## Docker Composeのインストール
 ### 1. Install Docker Compose 
