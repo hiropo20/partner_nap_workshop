@@ -25,7 +25,9 @@ Docker Hostへの接続は以下メニューを開き利用ください
 Docker HOSTへのSSH接続は、Jump Host経由　または、SSH鍵認証を用いて接続可能です。SSH鍵の登録手順は以下を参照ください
 ***SSH鍵を登録頂いていない場合、SSHはグレーアウトします***
 <br><a href="https://github.com/hiropo20/partner_nap_workshop_secure/blob/main/UDF_SSH_Key.pdf">UDF LAB SSH鍵登録マニュアル</a> (ラボ実施時閲覧可に変更します)<br>
-
+## LAB環境
+<br><img src="https://user-images.githubusercontent.com/43058573/122137731-498c4f80-ce80-11eb-84d6-a6e6f97e1a20.png" alt="lab" width="800"><br>
+- Windows Jumpo Host経由でログインするか、SSH Clientかどちらかの方法で接続ください
 ## ユーザの確認
 実行ユーザの確認
 ```
