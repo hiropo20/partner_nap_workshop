@@ -258,7 +258,7 @@ curl: (56) Recv failure: Connection reset by peer
 curl: (56) Recv failure: Connection reset by peer
 
 
-一定時間結果して状況が改善しない場合、再度docker-composeを実行してください
+一定時間経過して状況が改善しない場合、再度docker-composeを実行してください
 docker-compose -f docker-compose-lab-appprotect.yaml down
 docker-compose -f docker-compose-lab-appprotect.yaml up -d
 ``` 
